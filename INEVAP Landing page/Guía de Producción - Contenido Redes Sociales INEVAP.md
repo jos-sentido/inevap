@@ -1,0 +1,485 @@
+# GUÍA DE PRODUCCIÓN - CONTENIDO REDES SOCIALES INEVAP
+
+## 📋 **ESPECIFICACIONES GENERALES**
+
+### **Formatos Técnicos:**
+- **REELS:** 1080x1920px, MP4, máximo 30 segundos
+- **CARRETES:** 1080x1080px, JPG/PNG, máximo 10 slides
+- **POSTS FIJOS:** 1080x1080px, JPG/PNG
+
+### **Paleta de Colores INEVAP:**
+- Azul institucional: #1E3A8A
+- Dorado/Amarillo: #F59E0B
+- Blanco: #FFFFFF
+- Gris oscuro: #374151
+- Verde validación: #10B981
+
+### **Tipografías:**
+- **Títulos:** Montserrat Bold
+- **Subtítulos:** Montserrat SemiBold
+- **Texto corrido:** Open Sans Regular
+- **CTAs:** Montserrat Bold
+
+### **Logos Obligatorios:**
+- Logo INEVAP
+- Logo SEP
+- Logo UNIVER Veracruz (cuando aplique)
+
+---
+
+## 🎬 **REELS - INDICACIONES DE PRODUCCIÓN**
+
+### **REEL 1: "Tu Experiencia Merece un Título"**
+
+#### **GUIÓN DE VOICE OVER:**
+*Voz femenina, tono profesional y empático, ritmo moderado*
+
+"¿Tienes años de experiencia pero no el título? 
+Muchos tienen el papel, pocos tienen tu experiencia.
+En INEVAP convertimos tu conocimiento en título oficial.
+Titúlate en aproximadamente 6 meses.
+Tu experiencia vale. Certifícala."
+
+#### **Elementos Visuales:**
+**Segundos 0-5:** 
+- Stock footage: Contador profesional revisando estados financieros
+- CCG Visual: "¿Años de experiencia?"
+
+**Segundos 6-10:**
+- Transición a: Ingeniero con casco en planta industrial
+- CCG Visual: "¿Sin título oficial?"
+
+**Segundos 11-15:**
+- Montage rápido: Abogado, administrador, marketer
+- CCG Visual: "Muchos tienen el título, pocos tienen tu experiencia"
+
+**Segundos 16-20:**
+- Animación logo INEVAP + SEP
+- CCG Visual: "Convierte tu experiencia en título"
+
+**Segundos 21-25:**
+- Call to action visual
+- CCG Visual: "Titúlate en 6 meses promedio"
+
+#### **Animaciones Requeridas:**
+- Transiciones suaves entre clips (fade in/out)
+- Zoom sutil en momentos clave
+- Animación de logos (aparición progresiva)
+- CCG Visual text con entrada desde abajo
+
+#### **Música:**
+- Track instrumental corporativo, inspirador
+- Volumen bajo para permitir voice over claro
+- Build up gradual hacia el final
+
+---
+
+### **REEL 2: "El Proceso Completo INEVAP en 6 Pasos"**
+
+#### **GUIÓN DE VOICE OVER:**
+*Voz masculina, tono educativo y directo*
+
+"Tu camino al título en INEVAP:
+Paso 1: Te inscribes
+Paso 2: Validamos tu experiencia
+Paso 3: Recibes asesorías personalizadas
+Paso 4: Examen escrito en fin de semana
+Paso 5: Examen oral con caso práctico
+Paso 6: Ceremonia de titulación
+6 meses promedio, título oficial. ¿Empezamos?"
+
+#### **Elementos Visuales:**
+**Cada paso (4-5 segundos):**
+
+**Paso 1:** Animación de formulario llenándose
+**Paso 2:** Documentos con check marks apareciendo
+**Paso 3:** Icono de mentor + estudiante
+**Paso 4:** Calendario marcando fin de semana + escritorio
+**Paso 5:** Siluetas de sinodales + presentación
+**Paso 6:** Animación de birrete y diploma
+
+#### **Elementos Gráficos:**
+- Timeline horizontal animada
+- Números grandes para cada paso (1, 2, 3, 4, 5, 6)
+- Iconografía limpia y moderna
+- Progreso visual (barra de progreso)
+
+#### **Animaciones:**
+- Timeline que se llena progresivamente
+- Iconos que aparecen con bounce effect
+- Números con scale animation
+- Transición final a logos oficiales
+
+---
+
+### **REEL 3: "9 Carreras Disponibles"**
+
+#### **GUIÓN DE VOICE OVER:**
+*Voz femenina, tono dinámico y enérgico*
+
+"¿Tu profesión está disponible en INEVAP?
+Administración, Contaduría, Derecho,
+Ingeniería Industrial, Ingeniería Computacional,
+Mercadotecnia, Pedagogía, 
+Comercio Internacional, Educación Preescolar.
+9 carreras, 98% de aprobación.
+Encuentra la tuya."
+
+#### **Elementos Visuales:**
+**2-3 segundos por carrera:**
+- **Administración:** Executive en oficina moderna
+- **Contaduría:** Hands typing en calculadora con reportes
+- **Derecho:** Martillo de juez + códigos legales
+- **Ing. Industrial:** Hard hat + planta industrial
+- **Ing. Computacional:** Código en pantalla + teclado
+- **Mercadotecnia:** Gráficos de marketing + presentación
+- **Pedagogía:** Classroom setting + pizarrón
+- **Comercio Int.:** Contenedores/logística internacional
+- **Ed. Preescolar:** Maestra con niños pequeños
+
+#### **Elementos Gráficos:**
+- Insignia con nombre de cada carrera
+- Estadística "98%" prominente al final
+- Iconos profesionales para cada área
+
+---
+
+## 🎨 **CARRETES - ESPECIFICACIONES DE DISEÑO**
+
+### **CARRETE 1: "Proceso INEVAP: De la Experiencia al Título"**
+
+#### **Slide 1 - Portada:**
+- **Título:** "Tu camino al título en 6 meses"
+- **Subtítulo:** "Proceso INEVAP paso a paso"
+- **Visual:** Camino/timeline estilizado
+- **Colores:** Fondo azul institucional, texto blanco
+
+#### **Slides 2-7 - Pasos del Proceso:**
+**Layout consistente para cada slide:**
+- Número grande del paso (1, 2, 3, 4, 5, 6)
+- Título del paso en Montserrat Bold
+- Descripción breve en Open Sans
+- Icono representativo
+- Progreso visual (barra o círculos)
+
+**Contenido específico:**
+- **Slide 2:** "1. Inscripción y evaluación inicial"
+- **Slide 3:** "2. Validación de experiencia profesional"
+- **Slide 4:** "3. Asesorías personalizadas"
+- **Slide 5:** "4. Examen escrito (fines de semana)"
+- **Slide 6:** "5. Examen oral con caso práctico"
+- **Slide 7:** "6. Ceremonia de titulación oficial"
+
+#### **Elementos Gráficos Requeridos:**
+- Iconografía limpia y moderna para cada paso
+- Timeline conectando todos los pasos
+- Call to action en slide final
+- Logos SEP + INEVAP en cada slide
+
+---
+
+### **CARRETE 2: "Mitos y Realidades del Acuerdo 286"**
+
+#### **Slide 1 - Portada:**
+- **Título:** "¿Qué sabes del Acuerdo 286?"
+- **Subtítulo:** "Desmintiendo mitos comunes"
+- **Visual:** Iconos de preguntas y respuestas
+
+#### **Slides 2-6 - Mitos vs Realidades:**
+**Layout para cada mito:**
+- ❌ MITO en la parte superior
+- ✅ REALIDAD en la parte inferior
+- Colores contrastantes (rojo vs verde)
+- Iconografía de apoyo
+
+**Contenido específico:**
+- **Slide 2:** ❌ "No tiene validez oficial" / ✅ "100% avalado por SEP"
+- **Slide 3:** ❌ "Es muy difícil aprobar" / ✅ "98% de nuestros alumnos aprueban"
+- **Slide 4:** ❌ "Solo es para algunas carreras" / ✅ "9 licenciaturas e ingenierías"
+- **Slide 5:** ❌ "Toma muchos años" / ✅ "Proceso promedio de 6 meses"
+- **Slide 6:** ❌ "No valoran la experiencia" / ✅ "Tu experiencia es la base"
+
+#### **Elementos Visuales:**
+- Iconografía de mitos (X, signos de interrogación)
+- Iconografía de realidades (check marks, trofeos)
+- Certificaciones oficiales (SEP, UNIVER)
+- Contraste visual fuerte entre mito y realidad
+
+---
+
+### **CARRETE 3: "INEVAP vs Competencia: ¿Por Qué Somos Diferentes?"**
+
+#### **Slide 1 - Portada:**
+- **Título:** "¿Por qué elegir INEVAP?"
+- **Subtítulo:** "Conoce nuestras ventajas"
+- **Visual:** Logo INEVAP destacado con elementos diferenciadores
+
+#### **Slides 2-6 - Ventajas Competitivas:**
+**Layout consistente:**
+- Icono representativo de la ventaja
+- Título de la ventaja en grande
+- Descripción breve y convincente
+- Elemento visual de apoyo
+
+**Contenido específico:**
+- **Slide 2:** "98% de Tasa de Aprobación" + gráfico circular
+- **Slide 3:** "Exámenes en Fines de Semana" + calendario
+- **Slide 4:** "Validamos Tu Experiencia Real" + iconos profesionales
+- **Slide 5:** "4 Sedes en México" + mapa con ubicaciones
+- **Slide 6:** "Proceso en 6 Meses Promedio" + timeline compacto
+
+#### **Elementos Gráficos Requeridos:**
+- Iconografía diferenciadora por ventaja
+- Gráficos estadísticos simples
+- Mapa de México con sedes marcadas
+- Comparativas visuales sutiles
+- Call to action final: "Descubre la diferencia INEVAP"
+
+---
+
+## 📊 **POSTS FIJOS - ESPECIFICACIONES DETALLADAS**
+
+### **POST FIJO 1: "Datos Verificables INEVAP"**
+
+#### **Layout Sugerido:**
+- Header con logo INEVAP + "Datos Verificables"
+- 5 secciones de estadísticas
+- Footer con logos oficiales (SEP, UNIVER)
+
+#### **Elementos de Información:**
+```
+📊 98% de tasa de aprobación
+⏱️ Proceso promedio: 6 meses
+🏢 4 sedes activas en México
+✅ Avalado por SEP
+🎓 9 carreras disponibles
+👥 Cientos de titulados
+```
+
+#### **Especificaciones de Diseño:**
+- Gráficos circulares para porcentajes
+- Iconografía minimalista
+- Jerarquía visual clara
+- Colores institucionales
+
+---
+
+### **POST FIJO 2: "¿Eres Candidato Ideal para INEVAP?"**
+
+#### **Layout Tipo Quiz Visual:**
+- Header: "¿Eres candidato ideal?"
+- 6 preguntas con checkboxes
+- Resultado final motivador
+- CTA fuerte
+
+#### **Contenido del Quiz:**
+```
+✅ ¿Tienes experiencia laboral comprobable?
+✅ ¿Trabajas de lunes a viernes?
+✅ ¿Necesitas un título con validez oficial?
+✅ ¿Prefieres procesos eficientes?
+✅ ¿Valoras tu tiempo libre?
+✅ ¿Quieres certificar tu conocimiento?
+
+Si respondiste SÍ a 3 o más preguntas:
+¡INEVAP ES PARA TI!
+```
+
+#### **Elementos Visuales:**
+- Checkboxes grandes y llamativos
+- Iconografía representativa para cada pregunta
+- Medidor de "compatibilidad"
+- CTA prominente: "Descubre tu proceso personalizado"
+
+---
+
+### **POST FIJO 3: "Comparativa: Universidad vs INEVAP"**
+
+#### **Layout Tabla Comparativa:**
+- Dos columnas claramente divididas
+- Headers contrastantes
+- Checkmarks y X marks
+- Destacar ventajas INEVAP
+
+#### **Contenido Comparativo:**
+```
+UNIVERSIDAD TRADICIONAL vs INEVAP
+
+⏰ Tiempo: 4-5 años | 6 meses promedio
+📅 Horarios: Lunes a viernes | Solo fines de semana
+💼 Experiencia: No valorada | Base fundamental
+📝 Evaluación: Múltiples materias | 2 exámenes
+✅ Validez: Oficial | Oficial (misma)
+💰 Inversión: Alta | Accesible
+```
+
+---
+
+## 🎯 **POSTS ESPECIALES - ESPECIFICACIONES**
+
+### **Sesiones Informativas (8 y 22 Octubre)**
+
+#### **Elementos Visuales Requeridos:**
+- Dos calendarios destacando ambas fechas por separado
+- Horarios específicos para cada fecha (solicitar al cliente)
+- "GRATUITA" prominente
+- "ELIGE LA FECHA QUE MÁS TE CONVENGA" destacado
+- Registro/contacto claro
+- Visual de sala de conferencias o webinar
+
+#### **Copy Sugerido - Versión A (Post combinado):**
+```
+🗓️ SESIONES INFORMATIVAS GRATUITAS
+
+📅 ELIGE LA FECHA QUE MÁS TE CONVENGA:
+
+🔹 Miércoles 8 de Octubre - [Horario por confirmar]
+🔹 Miércoles 22 de Octubre - [Horario por confirmar]
+
+✅ Conoce el proceso completo de titulación
+✅ Resuelve todas tus dudas sobre el Acuerdo 286
+✅ Descubre cómo validamos tu experiencia laboral
+
+⚠️ CUPOS LIMITADOS POR SESIÓN
+
+📱 Regístrate indicando tu fecha preferida:
+WhatsApp 33 3949 8607
+```
+
+#### **Copy Alternativo - Versión B (Posts individuales):**
+
+**POST 1 - 8 de Octubre:**
+```
+🗓️ SESIÓN INFORMATIVA GRATUITA
+
+📅 Miércoles 8 de Octubre
+🕐 [Horario por confirmar]
+
+✅ Conoce el proceso completo
+✅ Resuelve todas tus dudas
+✅ Descubre cómo validamos tu experiencia
+
+📱 Regístrate: WhatsApp 33 3949 8607
+Menciona: "Sesión 8 de octubre"
+```
+
+**POST 2 - 22 de Octubre:**
+```
+🗓️ SEGUNDA SESIÓN INFORMATIVA GRATUITA
+
+📅 Miércoles 22 de Octubre
+🕐 [Horario por confirmar]
+
+¿Te perdiste la primera sesión? ¡Esta es tu oportunidad!
+
+✅ Conoce el proceso completo
+✅ Resuelve todas tus dudas
+✅ Descubre cómo validamos tu experiencia
+
+📱 Regístrate: WhatsApp 33 3949 8607
+Menciona: "Sesión 22 de octubre"
+```
+
+---
+
+### **Promoción Bono de Descuento**
+
+#### **Elementos Visuales Destacados:**
+- "$19,000" en tipografía grande
+- "DESCUENTO" con efecto llamativo
+- "12 MSI" prominente
+- Logos de tarjetas de crédito
+- Urgencia visual ("CUPOS LIMITADOS")
+
+#### **Layout Sugerido:**
+- Header de promoción llamativo
+- Beneficios en bullets
+- Logos de tarjetas aceptadas
+- CTA prominente
+- Footer con contacto
+
+#### **Copy Completo:**
+```
+🎉 PROMOCIÓN ESPECIAL
+
+💰 $19,000 DE DESCUENTO
+💳 12 MESES SIN INTERESES
+✅ Aceptamos todas las tarjetas
+
+🎓 Proceso completo en 6 meses
+📊 98% de tasa de aprobación
+🏢 4 sedes disponibles
+
+⚡ CUPOS LIMITADOS
+📱 WhatsApp: 33 3949 8607
+```
+
+---
+
+## 📝 **HASHTAGS ESTRATÉGICOS**
+
+### **Hashtags Principales:**
+#INEVAP #Acuerdo286 #TitulaciónPorExperiencia #ValidezOficial #SEP #TítuloUniversitario #ExperienciaLaboral #CertificaciónProfesional #UNIVER #México
+
+### **Hashtags por Carrera:**
+- **Administración:** #Administración #Gestión #Liderazgo
+- **Contaduría:** #Contaduría #Finanzas #Contabilidad
+- **Derecho:** #Derecho #Abogado #Legal
+- **Ingenierías:** #Ingeniería #Tecnología #Innovación
+- **Mercadotecnia:** #Marketing #Publicidad #Ventas
+- **Pedagogía:** #Educación #Enseñanza #Formación
+
+### **Hashtags de Engagement:**
+#ProfesionalesMéxico #DesarrolloProfesional #CrecimientoProfesional #EducaciónContinua #TítuloRápido #ExperienciaValora
+
+---
+
+## 🎤 **DIRECTRICES DE VOICE OVER**
+
+### **Tonos por Tipo de Contenido:**
+- **Educativo:** Claro, pausado, autoritativo
+- **Emocional:** Cálido, empático, inspirador
+- **Promocional:** Dinámico, entusiasta, urgente
+
+### **Especificaciones Técnicas:**
+- Calidad: 48kHz/24bit mínimo
+- Sin ruido de fondo
+- Niveles de audio consistentes
+- Pausas naturales para edición
+
+### **Locutores Recomendados:**
+- **Voz femenina:** Para contenido empático y educativo
+- **Voz masculina:** Para contenido técnico y promocional
+- Acentos neutros mexicanos
+
+---
+
+## ✅ **CHECKLIST DE CALIDAD**
+
+### **Antes de Publicar:**
+- [ ] Logos oficiales incluidos
+- [ ] Información verificada
+- [ ] Hashtags apropiados
+- [ ] CTA claro y específico
+- [ ] Formato técnico correcto
+- [ ] Ortografía y gramática revisadas
+- [ ] Coherencia con brand guidelines
+- [ ] Optimizado para cada plataforma
+
+### **Medición de Resultados:**
+- Engagement rate
+- Reach orgánico
+- Clicks en bio/WhatsApp
+- Saves/compartidos
+- Comentarios con preguntas específicas
+
+---
+
+## 📞 **INFORMACIÓN DE CONTACTO PARA INCLUIR**
+
+- **WhatsApp:** 33 3949 8607
+- **Website:** inevap.com
+- **Sedes:** Guadalajara, Cancún, Tijuana, Monterrey
+- **Redes:** @inevap (adaptar según plataforma)
+
+Esta guía debe ser utilizada como referencia para mantener consistencia en toda la producción de contenido para INEVAP.

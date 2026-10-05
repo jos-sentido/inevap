@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Title"/>
+      </w:pPr>
+      <w:r>
+        <w:t>GUÍA DE PRODUCCIÓN - CONTENIDO REDES SOCIALES INEVAP</w:t>
+      </w:r>
+    </w:p>
+    
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Heading1"/>
+      </w:pPr>
+      <w:r>
+        <w:t>📋 ESPECIFICACIONES GENERALES</w:t>
+      </w:r>
+    </w:p>
+    
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Heading2"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Formatos Técnicos:</w:t>
+      </w:r>
+    </w:p>
+    
+    <w:p>
+      <w:r>
+        <w:t>• REELS: 1080x1920px, MP4, máximo 30 segundos</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:r>
+        <w:t>• CARRETES: 1080x1080px, JPG/PNG, máximo 10 slides</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:r>
+        <w:t>• POSTS FIJOS: 1080x1080px, JPG/PNG</w:t>
+      </w:r>
+    </w:p>
+    
+    <!-- Continue with rest of content -->
+  </w:body>
+</w:document>

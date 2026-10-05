@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Dependencias / build
+node_modules/
+dist/
+build/
+.vite/
+*.log
+
+# Archivos binarios pesados de referencia (material estático del cliente).
+# Viven en Drive/Dropbox, no en git. GitHub rechaza archivos >100MB.
+*.pdf
+*.zip
+
+# Credenciales / entorno
+.env
+.env.*
+!.env.example
