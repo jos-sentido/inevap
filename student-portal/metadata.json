@@ -1,0 +1,8 @@
+{
+  "name": "INEVAP Student Portal",
+  "description": "A comprehensive student portal for INEVAP (Acuerdo 286 SEP) featuring gamified progress tracking, AI-powered document generation, and GHL integration logic.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": []
+}
