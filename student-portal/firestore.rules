@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && request.auth.token.admin == true; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['professionalProfile', 'name', 'updatedAt']);
+      allow delete: if false;
+
+      match /documents/{docId} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow create: if isOwner(uid);
+        allow update, delete: if false;
+      }
+      match /memoria/{docId} {
+        allow read, write: if isOwner(uid);
+      }
+      match /enrollments/{id} { allow read: if isOwner(uid) || isAdmin(); allow write: if false; }
+      match /exams/{id} { allow read: if isOwner(uid) || isAdmin(); allow write: if false; }
+    }
+
+    match /guides/{lic} { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /examSlots/{id} { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /config/{doc} { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /certifications/{uid} { allow read: if isOwner(uid) || isAdmin(); allow write: if false; }
+  }
+}

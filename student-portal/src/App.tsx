@@ -1,96 +1,112 @@
 
 import React, { useState, useEffect } from 'react';
-import { 
-  User as UserIcon, 
-  CheckCircle2, 
+import {
+  User as UserIcon,
+  CheckCircle2,
   Send,
   Loader2,
   LogOut,
   Bell,
   MessageSquare,
-  FileText,
   UploadCloud,
-  X,
-  AlertCircle,
   Menu,
-  ChevronLeft,
-  CreditCard,
   Sparkles,
   ShieldCheck,
-  BookOpen,
   Settings,
   Database,
   BrainCircuit,
   GraduationCap,
   Save,
   Zap,
-  Target,
   ClipboardCheck,
   Briefcase
 } from 'lucide-react';
-import { COLORS, STAGES_CONFIG, LICENCIATURAS } from './constants';
-import { User, UserRole, StageStatus, Message } from './types';
+import { STAGES_CONFIG, LICENCIATURAS } from './constants';
+import { Message, ProfessionalProfile } from './types';
 import { getAIResponse, verifyDocumentWithAI, getStudyTutorResponse } from './services/geminiService';
+import { useAuth } from './contexts/AuthContext';
+import AuthScreen from './components/auth/AuthScreen';
+import { db } from './lib/firebase';
+import { collection, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-const App: React.FC = () => {
+const emptyProfile: ProfessionalProfile = { yearsExp: '', currentRole: '', industry: '' };
+
+const Portal: React.FC = () => {
+  const { profile, isAdmin, logout, updateProfessionalProfile } = useAuth();
+  const prof = profile!; // garantizado por <App/>
+  const licenciatura = prof.licenciatura || 'General';
+  const professional = prof.professionalProfile || emptyProfile;
+
   const [isAdminMode, setIsAdminMode] = useState(false);
-  const [user, setUser] = useState<User & { profile?: { yearsExp: string, currentRole: string, industry: string } }>({
-    id: '1',
-    name: 'Juan Pérez',
-    email: 'juan.perez@example.com',
-    curp: 'PERJ880101HDFRRN01',
-    role: UserRole.ALUMNO,
-    currentStage: 5, 
-    licenciatura: 'Administración',
-    profile: {
-      yearsExp: '5',
-      currentRole: 'Gerente de Operaciones',
-      industry: 'Logística'
-    }
-  });
-
   const [activeStage, setActiveStage] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
+
+  // Formulario de perfil profesional (persistido en Firestore al salir del campo)
+  const [profileForm, setProfileForm] = useState<ProfessionalProfile>(professional);
+  const saveProfile = () => {
+    updateProfessionalProfile(profileForm).catch((e) => console.error('No se pudo guardar el perfil', e));
+  };
+
   // Estados para Chat de Estudio (Stage 2)
   const [studyMessages, setStudyMessages] = useState<Message[]>([
-    { role: 'model', text: `¡Bienvenido a tu zona de estudio personalizada! He analizado tu perfil y veo que tienes experiencia en ${user.profile?.industry}. Adaptaré los ejemplos de la guía de ${user.licenciatura} a tu entorno laboral actual. ¿Te parece bien si comenzamos con el primer módulo o tienes alguna duda específica?` }
+    { role: 'model', text: `¡Bienvenido a tu zona de estudio personalizada! He analizado tu perfil y veo que tienes experiencia en ${professional.industry || 'tu sector'}. Adaptaré los ejemplos de la guía de ${licenciatura} a tu entorno laboral actual. ¿Te parece bien si comenzamos con el primer módulo o tienes alguna duda específica?` }
   ]);
   const [studyInput, setStudyInput] = useState('');
   const [isStudyTyping, setIsStudyTyping] = useState(false);
 
   // Estados para Chat de Memoria (Stage 3)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: `¡Hola ${user.name}! Vamos a redactar tu Memoria Descriptiva. Tu rol como ${user.profile?.currentRole} será clave para el desarrollo técnico de este documento.` }
+    { role: 'model', text: `¡Hola ${prof.name}! Vamos a redactar tu Memoria Descriptiva. Tu rol como ${professional.currentRole || 'profesional'} será clave para el desarrollo técnico de este documento.` }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  
-  // Estados de Administración de Guías
-  const [guides, setGuides] = useState<Record<string, string>>({
-    'Administración': 'TEMARIO OFICIAL ADMINISTRACIÓN: 1. Proceso Administrativo. 2. Gestión de Talento Humano. 3. Finanzas para no financieros. 4. Mercadotecnia Estratégica. Conceptos clave: FODA, Reingeniería, Outsourcing.',
-    'Derecho': 'TEMARIO OFICIAL DERECHO: 1. Derecho Civil. 2. Juicios Orales. 3. Derecho Mercantil. 4. Amparo. Conceptos clave: Persona Jurídica, Acto Administrativo, Litis.',
-  });
+
+  // Guías (temarios) cargadas desde Firestore
+  const [guides, setGuides] = useState<Record<string, string>>({});
   const [selectedAdminLic, setSelectedAdminLic] = useState(LICENCIATURAS[0]);
   const [guideEditorContent, setGuideEditorContent] = useState('');
+  const [isSavingGuide, setIsSavingGuide] = useState(false);
 
-  const [uploadedDocs, setUploadedDocs] = useState<Record<string, { 
-    status: 'uploading' | 'verifying' | 'success' | 'error', 
-    fileName?: string, 
-    errorMsg?: string
-  }>>({});
+  useEffect(() => {
+    (async () => {
+      try {
+        const snap = await getDocs(collection(db, 'guides'));
+        const map: Record<string, string> = {};
+        snap.forEach((d) => {
+          const data = d.data() as { content?: string };
+          map[d.id] = data.content || '';
+        });
+        setGuides(map);
+      } catch (e) {
+        console.error('No se pudieron cargar las guías', e);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     setGuideEditorContent(guides[selectedAdminLic] || '');
-  }, [selectedAdminLic]);
+  }, [selectedAdminLic, guides]);
 
-  const handleSaveGuide = () => {
-    setGuides(prev => ({ ...prev, [selectedAdminLic]: guideEditorContent }));
-    const notification = document.createElement('div');
-    notification.className = "fixed bottom-8 right-8 bg-indigo-600 text-white px-6 py-3 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-4";
-    notification.innerHTML = `<div class="flex items-center gap-2"><span class="font-bold">✓ Guía Guardada:</span> ${selectedAdminLic}</div>`;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+  const handleSaveGuide = async () => {
+    setIsSavingGuide(true);
+    try {
+      await setDoc(doc(db, 'guides', selectedAdminLic), {
+        licenciatura: selectedAdminLic,
+        content: guideEditorContent,
+        lastUpdated: serverTimestamp(),
+      });
+      setGuides((prev) => ({ ...prev, [selectedAdminLic]: guideEditorContent }));
+      const notification = document.createElement('div');
+      notification.className = "fixed bottom-8 right-8 bg-indigo-600 text-white px-6 py-3 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-4";
+      notification.innerHTML = `<div class="flex items-center gap-2"><span class="font-bold">✓ Guía Guardada:</span> ${selectedAdminLic}</div>`;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 3000);
+    } catch (e) {
+      console.error('No se pudo guardar la guía', e);
+      alert('No se pudo guardar la guía. Verifica que tengas permisos de administrador.');
+    } finally {
+      setIsSavingGuide(false);
+    }
   };
 
   const handleSendStudyMessage = async () => {
@@ -101,10 +117,10 @@ const App: React.FC = () => {
     setStudyInput('');
     setIsStudyTyping(true);
 
-    const guideContent = guides[user.licenciatura || ''] || 'No hay guía cargada aún.';
-    const contextWithProfile = `El usuario es ${user.name}, con ${user.profile?.yearsExp} años de experiencia en ${user.profile?.industry} como ${user.profile?.currentRole}. \n\n ${guideContent}`;
-    
-    const response = await getStudyTutorResponse(newMessages, user.licenciatura || 'General', contextWithProfile);
+    const guideContent = guides[licenciatura] || 'No hay guía cargada aún.';
+    const contextWithProfile = `El usuario es ${prof.name}, con ${professional.yearsExp || 'varios'} años de experiencia en ${professional.industry || 'su sector'} como ${professional.currentRole || 'profesional'}. \n\n ${guideContent}`;
+
+    const response = await getStudyTutorResponse(newMessages, licenciatura, contextWithProfile);
     setStudyMessages([...newMessages, { role: 'model', text: response || 'Error al conectar con el tutor.' }]);
     setIsStudyTyping(false);
   };
@@ -116,7 +132,7 @@ const App: React.FC = () => {
     setMessages(newMessages);
     setInput('');
     setIsTyping(true);
-    const response = await getAIResponse(newMessages, user.licenciatura || 'General');
+    const response = await getAIResponse(newMessages, licenciatura);
     setMessages([...newMessages, { role: 'model', text: response || 'Error al conectar.' }]);
     setIsTyping(false);
   };
@@ -129,6 +145,12 @@ const App: React.FC = () => {
       reader.onerror = error => reject(error);
     });
   };
+
+  const [uploadedDocs, setUploadedDocs] = useState<Record<string, {
+    status: 'uploading' | 'verifying' | 'success' | 'error',
+    fileName?: string,
+    errorMsg?: string
+  }>>({});
 
   const handleDocumentUpload = async (docId: string, docName: string, file: File) => {
     setUploadedDocs(prev => ({ ...prev, [docId]: { status: 'uploading', fileName: file.name } }));
@@ -156,7 +178,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden relative font-sans">
-      
+
       {/* Sidebar Principal */}
       <aside className={`
         fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col transform transition-transform duration-300
@@ -180,36 +202,38 @@ const App: React.FC = () => {
               `}
             >
               <div className={`${activeStage === idx && !isAdminMode ? 'text-white' : 'text-[#2B5299]'}`}>{stage.icon}</div>
-              <div className="flex-1">
+              <div className="flex-1 text-left">
                 <p className={`text-sm font-bold leading-none mb-1 ${activeStage === idx && !isAdminMode ? 'text-white' : 'text-slate-800'}`}>{stage.title}</p>
                 <p className={`text-[10px] uppercase tracking-wider font-semibold ${activeStage === idx && !isAdminMode ? 'text-blue-200' : 'text-slate-400'}`}>Etapa {idx + 1}</p>
               </div>
             </button>
           ))}
-          <div className="pt-4 mt-4 border-t border-slate-100">
-            <button
-              onClick={() => { setIsAdminMode(true); setIsSidebarOpen(false); }}
-              className={`w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all
-                ${isAdminMode ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-slate-100 text-slate-600'}
-              `}
-            >
-              <Settings size={20} />
-              <div className="flex-1 text-left">
-                <p className="text-sm font-bold leading-none mb-1">Administración</p>
-                <p className="text-[10px] uppercase tracking-wider font-semibold opacity-60">Carga de Guías</p>
-              </div>
-            </button>
-          </div>
+          {isAdmin && (
+            <div className="pt-4 mt-4 border-t border-slate-100">
+              <button
+                onClick={() => { setIsAdminMode(true); setIsSidebarOpen(false); }}
+                className={`w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all
+                  ${isAdminMode ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-slate-100 text-slate-600'}
+                `}
+              >
+                <Settings size={20} />
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-bold leading-none mb-1">Administración</p>
+                  <p className="text-[10px] uppercase tracking-wider font-semibold opacity-60">Carga de Guías</p>
+                </div>
+              </button>
+            </div>
+          )}
         </nav>
 
         <div className="p-4 border-t border-slate-100 bg-slate-50/50">
           <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
             <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-[#2B5299] shrink-0"><UserIcon size={20} /></div>
             <div className="flex-1 overflow-hidden">
-              <p className="text-xs font-bold truncate text-slate-800">{user.name}</p>
-              <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
+              <p className="text-xs font-bold truncate text-slate-800">{prof.name}</p>
+              <p className="text-[10px] text-slate-500 truncate">{prof.email}</p>
             </div>
-            <button className="p-2 text-slate-300 hover:text-red-500 transition-all"><LogOut size={16} /></button>
+            <button onClick={() => logout()} title="Cerrar sesión" className="p-2 text-slate-300 hover:text-red-500 transition-all"><LogOut size={16} /></button>
           </div>
         </div>
       </aside>
@@ -232,8 +256,8 @@ const App: React.FC = () => {
 
         <section className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50/30">
           <div className="max-w-6xl mx-auto h-full pb-12">
-            
-            {isAdminMode ? (
+
+            {isAdminMode && isAdmin ? (
               /* PANEL DE ADMINISTRACIÓN DE GUÍAS */
               <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-indigo-100 border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-300 h-full flex flex-col">
                 <div className="p-8 border-b border-slate-100 bg-gradient-to-r from-indigo-50 to-white flex items-center justify-between">
@@ -252,7 +276,7 @@ const App: React.FC = () => {
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Carrera</label>
                     <div className="space-y-2">
                       {LICENCIATURAS.map(lic => (
-                        <button 
+                        <button
                           key={lic}
                           onClick={() => setSelectedAdminLic(lic)}
                           className={`w-full p-4 rounded-2xl text-xs font-bold text-left transition-all border flex items-center justify-between
@@ -266,17 +290,18 @@ const App: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex-1 p-8 flex flex-col gap-6">
-                    <textarea 
+                    <textarea
                       value={guideEditorContent}
                       onChange={(e) => setGuideEditorContent(e.target.value)}
                       placeholder="Carga aquí el temario y bibliografía..."
                       className="flex-1 w-full p-8 bg-slate-50 border border-slate-200 rounded-[2rem] outline-none focus:ring-4 focus:ring-indigo-100 transition-all font-mono text-sm leading-relaxed resize-none shadow-inner"
                     />
-                    <button 
+                    <button
                       onClick={handleSaveGuide}
-                      className="bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-4 uppercase tracking-widest text-sm"
+                      disabled={isSavingGuide}
+                      className="bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-4 uppercase tracking-widest text-sm disabled:opacity-50"
                     >
-                      <Save size={20} /> Guardar Conocimiento Base
+                      {isSavingGuide ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />} Guardar Conocimiento Base
                     </button>
                   </div>
                 </div>
@@ -307,13 +332,13 @@ const App: React.FC = () => {
                           return (
                             <label key={doc.id} className={`
                               relative flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-3xl cursor-pointer transition-all duration-300 min-h-[160px]
-                              ${status === 'success' ? 'border-emerald-200 bg-emerald-50/20' : 
+                              ${status === 'success' ? 'border-emerald-200 bg-emerald-50/20' :
                                 status === 'uploading' ? 'border-blue-300 bg-blue-50/40 animate-pulse' :
-                                status === 'error' ? 'border-red-200 bg-red-50/20' : 
+                                status === 'error' ? 'border-red-200 bg-red-50/20' :
                                 'border-slate-200 bg-slate-50/50 hover:border-[#2B5299] hover:bg-blue-50/10'}
                             `}>
-                              <input 
-                                type="file" className="hidden" 
+                              <input
+                                type="file" className="hidden"
                                 onChange={(e) => e.target.files && handleDocumentUpload(doc.id, doc.name, e.target.files[0])}
                                 disabled={status === 'success' || status === 'uploading'}
                               />
@@ -335,6 +360,7 @@ const App: React.FC = () => {
                                   <UploadCloud className="text-slate-300 mb-3" size={32} />
                                   <p className="text-xs font-bold text-slate-700">{doc.name}</p>
                                   <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-widest">Formatos PDF o JPG</p>
+                                  {status === 'error' && <p className="text-[9px] text-red-500 mt-2 text-center font-bold">{uploadedDocs[doc.id]?.errorMsg}</p>}
                                 </>
                               )}
                             </label>
@@ -353,37 +379,40 @@ const App: React.FC = () => {
                         </div>
                         <h2 className="text-2xl font-black mb-4 tracking-tight uppercase">ADN Profesional</h2>
                         <p className="text-blue-100/70 text-sm mb-8 font-medium leading-relaxed">Esta información permitirá que tu Tutor IA personalice cada lección según tu trayectoria real.</p>
-                        
+
                         <div className="space-y-5">
                           <div>
                             <label className="text-[10px] font-black uppercase tracking-widest text-blue-200 mb-2 block">Años de Experiencia</label>
-                            <input 
-                              type="number" 
-                              value={user.profile?.yearsExp}
-                              onChange={(e) => setUser(p => ({ ...p, profile: { ...p.profile!, yearsExp: e.target.value } }))}
+                            <input
+                              type="number"
+                              value={profileForm.yearsExp}
+                              onChange={(e) => setProfileForm(f => ({ ...f, yearsExp: e.target.value }))}
+                              onBlur={saveProfile}
                               className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 outline-none focus:bg-white/10 transition-all font-bold"
                             />
                           </div>
                           <div>
                             <label className="text-[10px] font-black uppercase tracking-widest text-blue-200 mb-2 block">Puesto Actual</label>
-                            <input 
-                              type="text" 
-                              value={user.profile?.currentRole}
-                              onChange={(e) => setUser(p => ({ ...p, profile: { ...p.profile!, currentRole: e.target.value } }))}
+                            <input
+                              type="text"
+                              value={profileForm.currentRole}
+                              onChange={(e) => setProfileForm(f => ({ ...f, currentRole: e.target.value }))}
+                              onBlur={saveProfile}
                               className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 outline-none focus:bg-white/10 transition-all font-bold"
                             />
                           </div>
                           <div>
                             <label className="text-[10px] font-black uppercase tracking-widest text-blue-200 mb-2 block">Industria / Sector</label>
-                            <input 
-                              type="text" 
-                              value={user.profile?.industry}
-                              onChange={(e) => setUser(p => ({ ...p, profile: { ...p.profile!, industry: e.target.value } }))}
+                            <input
+                              type="text"
+                              value={profileForm.industry}
+                              onChange={(e) => setProfileForm(f => ({ ...f, industry: e.target.value }))}
+                              onBlur={saveProfile}
                               className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 outline-none focus:bg-white/10 transition-all font-bold"
                             />
                           </div>
                         </div>
-                        
+
                         <div className="mt-8 pt-6 border-t border-white/10 flex items-center gap-4">
                            <Sparkles size={20} className="text-amber-400" />
                            <p className="text-[10px] font-bold text-blue-100 uppercase tracking-widest italic">Perfil alimentado a la IA de Estudio</p>
@@ -408,7 +437,7 @@ const App: React.FC = () => {
                           <h3 className="text-xl font-black text-slate-800 tracking-tight">Tutor Inteligente INEVAP</h3>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></span>
-                            <p className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">IA Adaptativa en línea • Contexto de {user.profile?.industry}</p>
+                            <p className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">IA Adaptativa en línea • Contexto de {professional.industry || 'tu sector'}</p>
                           </div>
                         </div>
                       </div>
@@ -417,8 +446,8 @@ const App: React.FC = () => {
                       {studyMessages.map((msg, idx) => (
                         <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2`}>
                           <div className={`max-w-[85%] md:max-w-[75%] p-5 md:p-6 rounded-[2rem] text-[14px] leading-relaxed shadow-sm whitespace-pre-wrap
-                            ${msg.role === 'user' 
-                              ? 'bg-[#2B5299] text-white rounded-br-none shadow-blue-200' 
+                            ${msg.role === 'user'
+                              ? 'bg-[#2B5299] text-white rounded-br-none shadow-blue-200'
                               : 'bg-white border border-slate-200 text-slate-700 rounded-bl-none'}
                           `}>
                             {msg.text}
@@ -433,22 +462,22 @@ const App: React.FC = () => {
                               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{animationDelay: '200ms'}}></span>
                               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{animationDelay: '400ms'}}></span>
                             </div>
-                            <span className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">Generando respuesta en texto plano...</span>
+                            <span className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">Generando respuesta...</span>
                           </div>
                         </div>
                       )}
                     </div>
                     <div className="p-6 md:p-8 border-t border-slate-100 bg-white">
                       <div className="flex gap-4 bg-slate-50 p-2 rounded-[2rem] border-2 border-slate-100 focus-within:border-emerald-200 focus-within:ring-8 focus-within:ring-emerald-50 transition-all">
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           value={studyInput}
                           onChange={(e) => setStudyInput(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && handleSendStudyMessage()}
                           placeholder="Escribe tu respuesta aquí..."
                           className="flex-1 bg-transparent px-6 py-3 text-sm outline-none font-medium placeholder:text-slate-400"
                         />
-                        <button 
+                        <button
                           onClick={handleSendStudyMessage}
                           disabled={isStudyTyping || !studyInput.trim()}
                           className="bg-emerald-600 text-white w-14 h-14 rounded-[1.2rem] hover:bg-emerald-700 transition-all disabled:opacity-30 flex items-center justify-center shadow-lg active:scale-95 shrink-0"
@@ -480,7 +509,7 @@ const App: React.FC = () => {
                           <span className="text-xs font-black tracking-widest uppercase">Análisis IA</span>
                         </div>
                         <p className="text-xs text-emerald-800/80 leading-relaxed font-medium italic">
-                          "Hemos detectado que tu fuerte es la **Estrategia en {user.profile?.industry}**. La guía se ha adaptado automáticamente."
+                          "Hemos detectado que tu fuerte es la Estrategia en {professional.industry || 'tu sector'}. La guía se ha adaptado automáticamente."
                         </p>
                       </div>
                     </div>
@@ -501,7 +530,7 @@ const App: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="text-xl font-black text-slate-800 tracking-tight">Redacción de Memoria IA</h3>
-                      <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest mt-1">Perfil: {user.profile?.currentRole}</p>
+                      <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest mt-1">Perfil: {professional.currentRole || 'Profesional'}</p>
                     </div>
                   </div>
                 </div>
@@ -517,10 +546,10 @@ const App: React.FC = () => {
                 </div>
                 <div className="p-8 border-t border-slate-100 bg-white">
                    <div className="flex gap-4 bg-slate-50 p-2 rounded-[2rem] border-2 border-slate-100">
-                    <input 
-                      type="text" 
-                      value={input} 
-                      onChange={(e) => setInput(e.target.value)} 
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Explica tus logros..."
                       className="flex-1 bg-transparent px-6 py-3 text-sm outline-none font-medium"
@@ -534,6 +563,7 @@ const App: React.FC = () => {
                 <div className="w-24 h-24 bg-white rounded-[2rem] shadow-xl flex items-center justify-center text-slate-300 mb-8 border border-slate-100">{currentStageInfo.icon}</div>
                 <h3 className="text-3xl font-black text-slate-800 mb-4">{currentStageInfo.title}</h3>
                 <p className="text-slate-500 max-w-md text-lg">{currentStageInfo.description}</p>
+                <span className="mt-6 text-[10px] font-black uppercase tracking-widest text-slate-300">Próximamente</span>
               </div>
             )}
           </div>
@@ -545,6 +575,33 @@ const App: React.FC = () => {
       `}</style>
     </div>
   );
+};
+
+const App: React.FC = () => {
+  const { loading, firebaseUser, profile } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="animate-spin text-[#2B5299]" size={40} />
+      </div>
+    );
+  }
+
+  if (!firebaseUser) {
+    return <AuthScreen />;
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4 text-center px-6">
+        <Loader2 className="animate-spin text-[#2B5299]" size={32} />
+        <p className="text-sm text-slate-500 font-medium">Preparando tu portal...</p>
+      </div>
+    );
+  }
+
+  return <Portal />;
 };
 
 export default App;

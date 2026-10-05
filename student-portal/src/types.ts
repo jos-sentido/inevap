@@ -17,14 +17,31 @@ export interface Stage {
   status: StageStatus;
 }
 
-export interface User {
-  id: string;
+export interface ProfessionalProfile {
+  yearsExp: string;
+  currentRole: string;
+  industry: string;
+}
+
+export interface Ghl {
+  contactId?: string;
+  opportunityId?: string;
+  pipelineId?: string;
+  stageId?: string;
+}
+
+/** Documento `users/{uid}` en Firestore. */
+export interface UserProfile {
+  uid: string;
   name: string;
   email: string;
-  curp: string;
+  curp?: string;
   role: UserRole;
-  currentStage: number;
   licenciatura?: string;
+  currentStage: number;
+  stageStatus?: Record<string, StageStatus>;
+  professionalProfile?: ProfessionalProfile;
+  ghl?: Ghl;
 }
 
 export interface Guide {
