@@ -20,7 +20,11 @@ import {
   Zap,
   ClipboardCheck,
   Briefcase,
-  Download
+  Download,
+  Users,
+  CalendarDays,
+  Eye,
+  ArrowLeft
 } from 'lucide-react';
 import { STAGES_CONFIG, LICENCIATURAS } from './constants';
 import { Message, ProfessionalProfile } from './types';
@@ -31,7 +35,9 @@ import AuthScreen from './components/auth/AuthScreen';
 import Agendado from './components/stages/Agendado';
 import Certificacion from './components/stages/Certificacion';
 import Inscripcion from './components/stages/Inscripcion';
-import AdminConsole from './components/admin/AdminConsole';
+import StudentsPanel from './components/admin/StudentsPanel';
+import ExamsPanel from './components/admin/ExamsPanel';
+import GuidesPanel from './components/admin/GuidesPanel';
 import { db, storage } from './lib/firebase';
 import { collection, getDocs, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes } from 'firebase/storage';
@@ -44,8 +50,10 @@ const Portal: React.FC = () => {
   const licenciatura = prof.licenciatura || 'General';
   const professional = prof.professionalProfile || emptyProfile;
 
-  const [isAdminMode, setIsAdminMode] = useState(false);
+  const [previewStudent, setPreviewStudent] = useState(false);
+  const [adminModule, setAdminModule] = useState<'alumnos' | 'examenes' | 'temarios'>('alumnos');
   const [activeStage, setActiveStage] = useState(0);
+  const showAdmin = isAdmin && !previewStudent;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Formulario de perfil profesional (persistido en Firestore al salir del campo)
@@ -192,6 +200,13 @@ const Portal: React.FC = () => {
 
   const currentStageInfo = STAGES_CONFIG[activeStage];
 
+  const ADMIN_MODULES = [
+    { id: 'alumnos' as const, title: 'Alumnos', subtitle: 'Gestión', icon: <Users size={20} /> },
+    { id: 'examenes' as const, title: 'Exámenes', subtitle: 'Agenda', icon: <CalendarDays size={20} /> },
+    { id: 'temarios' as const, title: 'Temarios', subtitle: 'Tutor IA', icon: <Database size={20} /> },
+  ];
+  const adminModuleTitle = ADMIN_MODULES.find((m) => m.id === adminModule)?.title || '';
+
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden relative font-sans">
 
@@ -209,36 +224,62 @@ const Portal: React.FC = () => {
         </div>
 
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2">
-          {STAGES_CONFIG.map((stage, idx) => (
-            <button
-              key={stage.id}
-              onClick={() => { setActiveStage(idx); setIsAdminMode(false); setIsSidebarOpen(false); }}
-              className={`w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all
-                ${activeStage === idx && !isAdminMode ? 'bg-[#2B5299] text-white shadow-lg shadow-blue-900/20' : 'hover:bg-slate-100'}
-              `}
-            >
-              <div className={`${activeStage === idx && !isAdminMode ? 'text-white' : 'text-[#2B5299]'}`}>{stage.icon}</div>
-              <div className="flex-1 text-left">
-                <p className={`text-sm font-bold leading-none mb-1 ${activeStage === idx && !isAdminMode ? 'text-white' : 'text-slate-800'}`}>{stage.title}</p>
-                <p className={`text-[10px] uppercase tracking-wider font-semibold ${activeStage === idx && !isAdminMode ? 'text-blue-200' : 'text-slate-400'}`}>Etapa {idx + 1}</p>
+          {showAdmin ? (
+            <>
+              {ADMIN_MODULES.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => { setAdminModule(m.id); setIsSidebarOpen(false); }}
+                  className={`w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all
+                    ${adminModule === m.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20' : 'hover:bg-slate-100'}
+                  `}
+                >
+                  <div className={`${adminModule === m.id ? 'text-white' : 'text-indigo-600'}`}>{m.icon}</div>
+                  <div className="flex-1 text-left">
+                    <p className={`text-sm font-bold leading-none mb-1 ${adminModule === m.id ? 'text-white' : 'text-slate-800'}`}>{m.title}</p>
+                    <p className={`text-[10px] uppercase tracking-wider font-semibold ${adminModule === m.id ? 'text-indigo-200' : 'text-slate-400'}`}>{m.subtitle}</p>
+                  </div>
+                </button>
+              ))}
+              <div className="pt-4 mt-4 border-t border-slate-100">
+                <button
+                  onClick={() => { setPreviewStudent(true); setActiveStage(0); setIsSidebarOpen(false); }}
+                  className="w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all hover:bg-slate-100 text-slate-600 border border-dashed border-slate-200"
+                >
+                  <Eye size={20} className="text-[#2B5299]" />
+                  <div className="flex-1 text-left">
+                    <p className="text-sm font-bold leading-none mb-1 text-slate-800">Ver como alumno</p>
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Vista previa del portal</p>
+                  </div>
+                </button>
               </div>
-            </button>
-          ))}
-          {isAdmin && (
-            <div className="pt-4 mt-4 border-t border-slate-100">
-              <button
-                onClick={() => { setIsAdminMode(true); setIsSidebarOpen(false); }}
-                className={`w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all
-                  ${isAdminMode ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-slate-100 text-slate-600'}
-                `}
-              >
-                <Settings size={20} />
-                <div className="flex-1 text-left">
-                  <p className="text-sm font-bold leading-none mb-1">Administración</p>
-                  <p className="text-[10px] uppercase tracking-wider font-semibold opacity-60">Carga de Guías</p>
-                </div>
-              </button>
-            </div>
+            </>
+          ) : (
+            <>
+              {isAdmin && previewStudent && (
+                <button
+                  onClick={() => { setPreviewStudent(false); setIsSidebarOpen(false); }}
+                  className="w-full flex items-center gap-3 p-3 mb-2 rounded-2xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-all font-bold text-sm"
+                >
+                  <ArrowLeft size={18} /> Volver a administración
+                </button>
+              )}
+              {STAGES_CONFIG.map((stage, idx) => (
+                <button
+                  key={stage.id}
+                  onClick={() => { setActiveStage(idx); setIsSidebarOpen(false); }}
+                  className={`w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all
+                    ${activeStage === idx ? 'bg-[#2B5299] text-white shadow-lg shadow-blue-900/20' : 'hover:bg-slate-100'}
+                  `}
+                >
+                  <div className={`${activeStage === idx ? 'text-white' : 'text-[#2B5299]'}`}>{stage.icon}</div>
+                  <div className="flex-1 text-left">
+                    <p className={`text-sm font-bold leading-none mb-1 ${activeStage === idx ? 'text-white' : 'text-slate-800'}`}>{stage.title}</p>
+                    <p className={`text-[10px] uppercase tracking-wider font-semibold ${activeStage === idx ? 'text-blue-200' : 'text-slate-400'}`}>Etapa {idx + 1}</p>
+                  </div>
+                </button>
+              ))}
+            </>
           )}
         </nav>
 
@@ -260,12 +301,17 @@ const Portal: React.FC = () => {
           <div className="flex items-center gap-4">
             <button onClick={() => setIsSidebarOpen(true)} className="md:hidden p-2 hover:bg-slate-50 rounded-xl border border-slate-100"><Menu size={24} /></button>
             <div className="flex flex-col">
-              <h1 className="text-base md:text-xl font-bold text-slate-800">{isAdminMode ? 'Gestión de Guías Oficiales' : currentStageInfo.title}</h1>
-              {!isAdminMode && <p className="hidden md:block text-xs text-slate-500 mt-0.5">{currentStageInfo.description}</p>}
+              <h1 className="text-base md:text-xl font-bold text-slate-800">{showAdmin ? adminModuleTitle : currentStageInfo.title}</h1>
+              {!showAdmin && <p className="hidden md:block text-xs text-slate-500 mt-0.5">{currentStageInfo.description}</p>}
             </div>
           </div>
           <div className="flex items-center gap-3">
-             {isAdminMode && <span className="bg-indigo-100 text-indigo-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Admin Access</span>}
+             {showAdmin && <span className="bg-indigo-100 text-indigo-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Admin Access</span>}
+             {isAdmin && previewStudent && (
+               <button onClick={() => setPreviewStudent(false)} className="bg-indigo-50 text-indigo-700 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest flex items-center gap-1.5 hover:bg-indigo-100 transition-all">
+                 <Eye size={12} /> Vista previa · Salir
+               </button>
+             )}
              <button className="relative p-2 text-slate-400 hover:bg-slate-50 rounded-xl transition-all"><Bell size={20} /></button>
           </div>
         </header>
@@ -273,9 +319,11 @@ const Portal: React.FC = () => {
         <section className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50/30">
           <div className="max-w-6xl mx-auto h-full pb-12">
 
-            {isAdminMode && isAdmin ? (
-              /* CONSOLA DE ADMINISTRACIÓN */
-              <AdminConsole />
+            {showAdmin ? (
+              /* MÓDULOS DE ADMINISTRACIÓN */
+              adminModule === 'alumnos' ? <StudentsPanel /> :
+              adminModule === 'examenes' ? <ExamsPanel /> :
+              <GuidesPanel />
             ) : activeStage === 0 ? (
               /* ETAPA 0: ADMISIÓN Y PERFILAMIENTO */
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
