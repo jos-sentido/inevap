@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { getGenAI, MODEL, toContents, ChatMessage } from '../_lib/gemini.js';
+import { getGenAI, MODEL, ChatMessage } from '../_lib/gemini.js';
 import { verifyAuth } from '../_lib/auth.js';
 import { adminDb, adminStorage } from '../_lib/firebaseAdmin.js';
 
@@ -36,9 +36,12 @@ INTRODUCCIÓN
 DESARROLLO DE LA EXPERIENCIA
 CONCLUSIONES TÉCNICAS
 Redacta en primera persona, tono profesional e institucional. Si falta información, redacta de forma general pero coherente.`;
+    const transcript = (messages || [])
+      .map((m) => `${m.role === 'user' ? 'Alumno' : 'Asesor'}: ${m.text}`)
+      .join('\n');
     const resp = await ai.models.generateContent({
       model: MODEL,
-      contents: toContents(messages || []),
+      contents: [{ role: 'user', parts: [{ text: `Conversación entre el asesor y el alumno:\n\n${transcript}\n\nCon base en lo anterior, redacta ahora la Memoria Descriptiva final.` }] }],
       config: { systemInstruction: sys, temperature: 0.6 },
     });
     const texto = sanitize(resp.text || 'No fue posible compilar la memoria.');

@@ -71,12 +71,15 @@ const Portal: React.FC = () => {
 
   const handleGenerateMemoriaPdf = async () => {
     setMemoriaPdfLoading(true);
+    const win = window.open('', '_blank'); // abre en el gesto del clic (evita bloqueo de pop-ups)
     try {
       const { url } = await authedPostJSON<{ url: string }>('/api/memoria/pdf', { messages });
-      if (url) window.open(url, '_blank');
-      else throw new Error('sin url');
+      if (!url) throw new Error('sin url');
+      if (win) win.location.href = url;
+      else window.location.href = url;
     } catch (e) {
       console.error(e);
+      if (win) win.close();
       alert('No se pudo generar el PDF de tu memoria. Intenta de nuevo.');
     } finally {
       setMemoriaPdfLoading(false);
