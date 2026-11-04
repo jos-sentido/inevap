@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getGenAI, MODEL } from '../_lib/gemini';
+import { verifyAuth } from '../_lib/auth';
 
 // NOTA (Fase 2): migrar a recibir `storagePath` y descargar de Firebase Storage
 // en el servidor, para evitar el límite de 4.5 MB de body de las funciones Vercel.
@@ -7,6 +8,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  const user = await verifyAuth(req);
+  if (!user) return res.status(401).json({ error: 'No autorizado' });
 
   const { base64Data, mimeType, expectedDocName } = (req.body || {}) as {
     base64Data: string;

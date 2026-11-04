@@ -1,20 +1,9 @@
 import { Message } from '../types';
-
-async function postJSON<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(path, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    throw new Error(`API error ${res.status}`);
-  }
-  return res.json() as Promise<T>;
-}
+import { authedPostJSON } from '../lib/api';
 
 export const getAIResponse = async (history: Message[], licenciatura: string) => {
   try {
-    const data = await postJSON<{ text: string }>('/api/gemini/memoria', { history, licenciatura });
+    const data = await authedPostJSON<{ text: string }>('/api/gemini/memoria', { history, licenciatura });
     return data.text;
   } catch (error) {
     console.error('Gemini API Error:', error);
@@ -28,7 +17,7 @@ export const getStudyTutorResponse = async (
   guideContent: string,
 ) => {
   try {
-    const data = await postJSON<{ text: string }>('/api/gemini/tutor', {
+    const data = await authedPostJSON<{ text: string }>('/api/gemini/tutor', {
       history,
       licenciatura,
       guideContent,
@@ -46,7 +35,7 @@ export const verifyDocumentWithAI = async (
   expectedDocName: string,
 ): Promise<{ isValid: boolean; reason: string; confidence: number }> => {
   try {
-    return await postJSON('/api/gemini/verify-document', { base64Data, mimeType, expectedDocName });
+    return await authedPostJSON('/api/gemini/verify-document', { base64Data, mimeType, expectedDocName });
   } catch (error) {
     console.error('Document Verification Error:', error);
     return { isValid: false, reason: 'Error técnico.', confidence: 0 };

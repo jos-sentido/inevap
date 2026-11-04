@@ -1,10 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getGenAI, toContents, MODEL, ChatMessage } from '../_lib/gemini';
+import { verifyAuth } from '../_lib/auth';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  const user = await verifyAuth(req);
+  if (!user) return res.status(401).json({ error: 'No autorizado' });
 
   const { history, licenciatura } = (req.body || {}) as {
     history: ChatMessage[];
