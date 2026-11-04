@@ -54,3 +54,22 @@ export interface Message {
   role: 'user' | 'model';
   text: string;
 }
+
+export type ExamType = 'teorico' | 'oral';
+
+export interface ExamSlot {
+  id: string;
+  examType: ExamType;
+  dateTime: string; // ISO
+  capacity: number;
+  booked: number;
+  modality?: string;
+}
+
+export interface Exam {
+  id: string;
+  examType: ExamType;
+  slotId: string;
+  scheduledAt: string; // ISO
+  status: 'booked' | 'completed' | 'cancelled';
+}

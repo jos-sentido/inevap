@@ -26,6 +26,7 @@ import { Message, ProfessionalProfile } from './types';
 import { getAIResponse, verifyDocumentWithAI, getStudyTutorResponse } from './services/geminiService';
 import { useAuth } from './contexts/AuthContext';
 import AuthScreen from './components/auth/AuthScreen';
+import Agendado from './components/stages/Agendado';
 import { db } from './lib/firebase';
 import { collection, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -558,6 +559,9 @@ const Portal: React.FC = () => {
                   </div>
                 </div>
               </div>
+            ) : activeStage === 4 ? (
+              /* ETAPA 4: AGENDADO DE EXÁMENES */
+              <Agendado />
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="w-24 h-24 bg-white rounded-[2rem] shadow-xl flex items-center justify-center text-slate-300 mb-8 border border-slate-100">{currentStageInfo.icon}</div>
