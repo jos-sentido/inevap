@@ -24,7 +24,8 @@ import {
   Users,
   CalendarDays,
   Eye,
-  ArrowLeft
+  ArrowLeft,
+  Target
 } from 'lucide-react';
 import { STAGES_CONFIG, LICENCIATURAS } from './constants';
 import { Message, ProfessionalProfile } from './types';
@@ -39,6 +40,7 @@ import Bienvenida from './components/stages/Bienvenida';
 import StudentsPanel from './components/admin/StudentsPanel';
 import ExamsPanel from './components/admin/ExamsPanel';
 import GuidesPanel from './components/admin/GuidesPanel';
+import ProspectsPanel from './components/admin/ProspectsPanel';
 import { db, storage } from './lib/firebase';
 import { collection, getDocs, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes } from 'firebase/storage';
@@ -52,7 +54,7 @@ const Portal: React.FC = () => {
   const professional = prof.professionalProfile || emptyProfile;
 
   const [previewStudent, setPreviewStudent] = useState(false);
-  const [adminModule, setAdminModule] = useState<'alumnos' | 'examenes' | 'temarios'>('alumnos');
+  const [adminModule, setAdminModule] = useState<'prospectos' | 'alumnos' | 'examenes' | 'temarios'>('prospectos');
   const [activeStage, setActiveStage] = useState(0);
   const showAdmin = isAdmin && !previewStudent;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -202,6 +204,7 @@ const Portal: React.FC = () => {
   const currentStageInfo = STAGES_CONFIG[activeStage];
 
   const ADMIN_MODULES = [
+    { id: 'prospectos' as const, title: 'Prospectos', subtitle: 'Pipeline', icon: <Target size={20} /> },
     { id: 'alumnos' as const, title: 'Alumnos', subtitle: 'Gestión', icon: <Users size={20} /> },
     { id: 'examenes' as const, title: 'Exámenes', subtitle: 'Agenda', icon: <CalendarDays size={20} /> },
     { id: 'temarios' as const, title: 'Temarios', subtitle: 'Tutor IA', icon: <Database size={20} /> },
@@ -324,6 +327,7 @@ const Portal: React.FC = () => {
 
             {showAdmin ? (
               /* MÓDULOS DE ADMINISTRACIÓN */
+              adminModule === 'prospectos' ? <ProspectsPanel /> :
               adminModule === 'alumnos' ? <StudentsPanel /> :
               adminModule === 'examenes' ? <ExamsPanel /> :
               <GuidesPanel />

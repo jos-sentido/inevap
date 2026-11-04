@@ -77,16 +77,8 @@ async function getPipeline(): Promise<Pipeline | null> {
   return pipelineCache;
 }
 
-/** Resuelve {pipelineId, stageId} para una etapa del portal (0-5) usando GHL_STAGE_MAP (nombres). */
-export async function resolveStage(stageIndex: number): Promise<{ pipelineId: string; stageId: string } | null> {
-  let map: Record<string, string> = {};
-  try {
-    map = JSON.parse(process.env.GHL_STAGE_MAP || '{}');
-  } catch {
-    return null;
-  }
-  const stageName = map[String(stageIndex)];
-  if (!stageName) return null;
+/** Resuelve {pipelineId, stageId} a partir del nombre de un stage (normalizado). */
+export async function resolveStageByName(stageName: string): Promise<{ pipelineId: string; stageId: string } | null> {
   const pipeline = await getPipeline();
   if (!pipeline) return null;
   const target = norm(stageName);
@@ -100,46 +92,44 @@ export async function resolveStage(stageIndex: number): Promise<{ pipelineId: st
   return { pipelineId: pipeline.id, stageId: stage.id };
 }
 
-/** Crea o mueve una oportunidad a la etapa indicada del portal. Devuelve opportunityId. */
-export async function moveToStage(params: {
-  contactId: string;
-  stageIndex: number;
-  opportunityId?: string;
-  name: string;
-  monetaryValue?: number;
-}): Promise<string | null> {
-  const resolved = await resolveStage(params.stageIndex);
-  if (!resolved) return params.opportunityId || null;
-  const { pipelineId, stageId } = resolved;
-  const locationId = process.env.GHL_LOCATION_ID!;
+/** Resuelve usando GHL_STAGE_MAP (índice de etapa del portal -> nombre de stage). */
+export async function resolveStage(stageIndex: number): Promise<{ pipelineId: string; stageId: string } | null> {
+  let map: Record<string, string> = {};
+  try { map = JSON.parse(process.env.GHL_STAGE_MAP || '{}'); } catch { return null; }
+  const stageName = map[String(stageIndex)];
+  if (!stageName) return null;
+  return resolveStageByName(stageName);
+}
 
+async function writeOpportunity(resolved: { pipelineId: string; stageId: string }, params: { contactId: string; opportunityId?: string; name: string; status?: string; monetaryValue?: number }): Promise<string | null> {
+  const { pipelineId, stageId } = resolved;
   if (params.opportunityId) {
     const res = await fetch(`${BASE}/opportunities/${params.opportunityId}`, {
-      method: 'PUT',
-      headers: headers(),
-      body: JSON.stringify({ pipelineId, pipelineStageId: stageId }),
+      method: 'PUT', headers: headers(),
+      body: JSON.stringify({ pipelineId, pipelineStageId: stageId, ...(params.status ? { status: params.status } : {}) }),
     });
     if (!res.ok) console.error('GHL update opportunity', res.status, await res.text());
     return params.opportunityId;
   }
-
   const res = await fetch(`${BASE}/opportunities/`, {
-    method: 'POST',
-    headers: headers(),
-    body: JSON.stringify({
-      locationId,
-      pipelineId,
-      pipelineStageId: stageId,
-      contactId: params.contactId,
-      name: params.name,
-      status: 'open',
-      monetaryValue: params.monetaryValue,
-    }),
+    method: 'POST', headers: headers(),
+    body: JSON.stringify({ locationId: process.env.GHL_LOCATION_ID, pipelineId, pipelineStageId: stageId, contactId: params.contactId, name: params.name, status: params.status || 'open', monetaryValue: params.monetaryValue }),
   });
-  if (!res.ok) {
-    console.error('GHL create opportunity', res.status, await res.text());
-    return null;
-  }
+  if (!res.ok) { console.error('GHL create opportunity', res.status, await res.text()); return null; }
   const data = (await res.json()) as { opportunity?: { id?: string }; id?: string };
   return data.opportunity?.id || data.id || null;
+}
+
+/** Crea o mueve una oportunidad a la etapa indicada del portal. */
+export async function moveToStage(params: { contactId: string; stageIndex: number; opportunityId?: string; name: string; monetaryValue?: number }): Promise<string | null> {
+  const resolved = await resolveStage(params.stageIndex);
+  if (!resolved) return params.opportunityId || null;
+  return writeOpportunity(resolved, params);
+}
+
+/** Mueve/crea una oportunidad a un stage por NOMBRE (ej. "Descartado"). */
+export async function moveToStageNamed(params: { contactId: string; stageName: string; opportunityId?: string; name: string; status?: string }): Promise<string | null> {
+  const resolved = await resolveStageByName(params.stageName);
+  if (!resolved) return params.opportunityId || null;
+  return writeOpportunity(resolved, params);
 }

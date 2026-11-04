@@ -1,6 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { requireAdmin } from '../_lib/requireAdmin.js';
 import { adminAuth, adminDb, adminStorage } from '../_lib/firebaseAdmin.js';
+import { ghlConfigured, upsertContact, moveToStageNamed } from '../_lib/ghl.js';
+
+const DEFAULT_LOSS_REASONS = ['Precio', 'No tiene documentos', 'Solo exploraba', 'No contesta', 'Se inscribió en otro lado', 'No calificó', 'Sin interés'];
 
 const iso = (v: any) => (v?.toDate ? v.toDate().toISOString() : v || null);
 
@@ -19,9 +22,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const students = snap.docs.map((d) => {
           const u = d.data() as any;
           return {
-            uid: d.id, name: u.name || '', email: u.email || '',
-            licenciatura: u.licenciatura || '', currentStage: u.currentStage ?? 0,
+            uid: d.id, name: u.name || '', email: u.email || '', phone: u.phone || '',
+            city: u.city || '', licenciatura: u.licenciatura || '', currentStage: u.currentStage ?? 0,
             role: u.role || 'ALUMNO', totalAbonado: u.payment?.totalAbonado ?? 0,
+            lead: u.lead || { status: 'active' }, preQual: u.preQual || null,
             createdAt: iso(u.createdAt),
           };
         });
@@ -148,6 +152,50 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(200).json({ ok: true });
         }
         return res.status(405).json({ error: 'Method not allowed' });
+      }
+
+      // ---- GET/POST motivos de pérdida (lista gestionable) ----
+      case 'loss-reasons': {
+        if (req.method === 'POST') {
+          const { reasons } = (req.body || {}) as { reasons?: string[] };
+          if (!Array.isArray(reasons)) return res.status(400).json({ error: 'reasons inválido' });
+          await db.doc('config/lossReasons').set({ reasons, updatedAt: new Date(), updatedBy: admin.uid });
+          return res.status(200).json({ ok: true, reasons });
+        }
+        const snap = await db.doc('config/lossReasons').get();
+        const reasons = snap.exists ? (snap.data() as any).reasons : DEFAULT_LOSS_REASONS;
+        return res.status(200).json({ reasons });
+      }
+
+      // ---- POST estado del lead (perdido / reactivar) ----
+      case 'set-lead': {
+        if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+        const { uid, status, lostReasons, note } = (req.body || {}) as { uid?: string; status?: string; lostReasons?: string[]; note?: string };
+        if (!uid || !status) return res.status(400).json({ error: 'Faltan datos' });
+        const lead: Record<string, unknown> = { status };
+        if (status === 'lost') {
+          lead.lostReasons = lostReasons || [];
+          lead.lostAt = new Date();
+          lead.lostBy = admin.uid;
+          if (note) lead.note = note;
+        }
+        await db.doc(`users/${uid}`).set({ lead, updatedAt: new Date() }, { merge: true });
+
+        // Best-effort GHL: mover a "Descartado" al perder
+        if (status === 'lost' && ghlConfigured()) {
+          try {
+            const u = (await db.doc(`users/${uid}`).get()).data() as any;
+            const contactId = u.ghl?.contactId || (await upsertContact({ email: u.email, name: u.name, phone: u.phone, licenciatura: u.licenciatura }));
+            if (contactId) {
+              const oppId = await moveToStageNamed({ contactId, stageName: 'Descartado', opportunityId: u.ghl?.opportunityId, name: u.name || u.email || 'Prospecto', status: 'lost' });
+              const ghlData: Record<string, string> = { contactId };
+              const opp = oppId || u.ghl?.opportunityId;
+              if (opp) ghlData.opportunityId = opp;
+              await db.doc(`users/${uid}`).set({ ghl: ghlData }, { merge: true });
+            }
+          } catch (e) { console.error('GHL descartar (no bloqueante)', e); }
+        }
+        return res.status(200).json({ ok: true });
       }
 
       default:
