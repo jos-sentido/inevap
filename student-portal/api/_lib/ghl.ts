@@ -1,5 +1,6 @@
 // Integración con GoHighLevel (LeadConnector API v2).
 // Best-effort: si GHL falla, NO debe romper el flujo del alumno.
+// Resuelve pipeline y stages por NOMBRE para no depender de IDs opacos.
 const BASE = 'https://services.leadconnectorhq.com';
 const VERSION = '2021-07-28';
 
@@ -26,7 +27,6 @@ export interface UpsertContactInput {
   licenciatura?: string;
 }
 
-/** Crea o actualiza un contacto. Devuelve el contactId de GHL. */
 export async function upsertContact(input: UpsertContactInput): Promise<string | null> {
   const locationId = process.env.GHL_LOCATION_ID!;
   const [firstName, ...rest] = (input.name || '').trim().split(' ');
@@ -39,11 +39,7 @@ export async function upsertContact(input: UpsertContactInput): Promise<string |
     phone: input.phone || undefined,
     tags: ['portal-inevap', input.licenciatura].filter(Boolean),
   };
-  const res = await fetch(`${BASE}/contacts/upsert`, {
-    method: 'POST',
-    headers: headers(),
-    body: JSON.stringify(body),
-  });
+  const res = await fetch(`${BASE}/contacts/upsert`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
   if (!res.ok) {
     console.error('GHL upsertContact', res.status, await res.text());
     return null;
@@ -52,31 +48,71 @@ export async function upsertContact(input: UpsertContactInput): Promise<string |
   return data.contact?.id || data.id || null;
 }
 
-/** Crea o mueve una oportunidad al stage indicado. Devuelve el opportunityId. */
+interface Pipeline { id: string; name: string; stages: { id: string; name: string }[] }
+let pipelineCache: Pipeline | null = null;
+
+/** Obtiene el pipeline objetivo (por GHL_PIPELINE_ID o GHL_PIPELINE_NAME). */
+async function getPipeline(): Promise<Pipeline | null> {
+  if (pipelineCache) return pipelineCache;
+  const locationId = process.env.GHL_LOCATION_ID!;
+  const res = await fetch(`${BASE}/opportunities/pipelines?locationId=${locationId}`, { headers: headers() });
+  if (!res.ok) {
+    console.error('GHL getPipeline', res.status, await res.text());
+    return null;
+  }
+  const data = (await res.json()) as { pipelines?: Pipeline[] };
+  const pipelines = data.pipelines || [];
+  const byId = process.env.GHL_PIPELINE_ID;
+  const byName = (process.env.GHL_PIPELINE_NAME || '').toLowerCase();
+  const found =
+    (byId && pipelines.find((p) => p.id === byId)) ||
+    (byName && pipelines.find((p) => p.name.toLowerCase() === byName)) ||
+    pipelines[0] ||
+    null;
+  pipelineCache = found || null;
+  return pipelineCache;
+}
+
+/** Resuelve {pipelineId, stageId} para una etapa del portal (0-5) usando GHL_STAGE_MAP (nombres). */
+export async function resolveStage(stageIndex: number): Promise<{ pipelineId: string; stageId: string } | null> {
+  let map: Record<string, string> = {};
+  try {
+    map = JSON.parse(process.env.GHL_STAGE_MAP || '{}');
+  } catch {
+    return null;
+  }
+  const stageName = map[String(stageIndex)];
+  if (!stageName) return null;
+  const pipeline = await getPipeline();
+  if (!pipeline) return null;
+  const stage = pipeline.stages.find((s) => s.name.toLowerCase() === stageName.toLowerCase());
+  if (!stage) {
+    console.error(`GHL: stage "${stageName}" no encontrado en pipeline "${pipeline.name}"`);
+    return null;
+  }
+  return { pipelineId: pipeline.id, stageId: stage.id };
+}
+
+/** Crea o mueve una oportunidad a la etapa indicada del portal. Devuelve opportunityId. */
 export async function moveToStage(params: {
   contactId: string;
-  stageId: string;
+  stageIndex: number;
   opportunityId?: string;
   name: string;
   monetaryValue?: number;
 }): Promise<string | null> {
+  const resolved = await resolveStage(params.stageIndex);
+  if (!resolved) return params.opportunityId || null;
+  const { pipelineId, stageId } = resolved;
   const locationId = process.env.GHL_LOCATION_ID!;
-  const pipelineId = process.env.GHL_PIPELINE_ID;
-  if (!pipelineId) {
-    console.error('GHL_PIPELINE_ID no configurada');
-    return null;
-  }
 
   if (params.opportunityId) {
     const res = await fetch(`${BASE}/opportunities/${params.opportunityId}`, {
       method: 'PUT',
       headers: headers(),
-      body: JSON.stringify({ pipelineId, pipelineStageId: params.stageId }),
+      body: JSON.stringify({ pipelineId, pipelineStageId: stageId }),
     });
-    if (!res.ok) {
-      console.error('GHL update opportunity', res.status, await res.text());
-      return params.opportunityId;
-    }
+    if (!res.ok) console.error('GHL update opportunity', res.status, await res.text());
     return params.opportunityId;
   }
 
@@ -86,7 +122,7 @@ export async function moveToStage(params: {
     body: JSON.stringify({
       locationId,
       pipelineId,
-      pipelineStageId: params.stageId,
+      pipelineStageId: stageId,
       contactId: params.contactId,
       name: params.name,
       status: 'open',
@@ -99,14 +135,4 @@ export async function moveToStage(params: {
   }
   const data = (await res.json()) as { opportunity?: { id?: string }; id?: string };
   return data.opportunity?.id || data.id || null;
-}
-
-/** Mapa etapa INEVAP (0-5) -> stageId de GHL, desde GHL_STAGE_MAP (JSON). */
-export function stageIdFor(stageIndex: number): string | null {
-  try {
-    const map = JSON.parse(process.env.GHL_STAGE_MAP || '{}') as Record<string, string>;
-    return map[String(stageIndex)] || null;
-  } catch {
-    return null;
-  }
 }

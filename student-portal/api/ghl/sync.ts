@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { verifyAuth } from '../_lib/auth.js';
 import { adminDb } from '../_lib/firebaseAdmin.js';
-import { ghlConfigured, upsertContact, moveToStage, stageIdFor } from '../_lib/ghl.js';
+import { ghlConfigured, upsertContact, moveToStage } from '../_lib/ghl.js';
 
 // Best-effort: sincroniza el alumno con GHL (contacto + etapa de pipeline).
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -34,21 +34,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!contactId) return res.status(200).json({ ok: false, error: 'No se obtuvo contactId' });
 
-    const updates: Record<string, unknown> = { 'ghl.contactId': contactId };
-
     const stageIndex = moveStage ?? data.currentStage ?? 0;
-    const stageId = stageIdFor(stageIndex);
-    if (stageId) {
-      const oppId = await moveToStage({
-        contactId,
-        stageId,
-        opportunityId: data.ghl?.opportunityId,
-        name: data.name || data.email || 'Alumno INEVAP',
-      });
-      if (oppId) updates['ghl.opportunityId'] = oppId;
-    }
+    const oppId = await moveToStage({
+      contactId,
+      stageIndex,
+      opportunityId: data.ghl?.opportunityId,
+      name: data.name || data.email || 'Alumno INEVAP',
+    });
 
-    await userRef.set({ ghl: { contactId, opportunityId: updates['ghl.opportunityId'] || data.ghl?.opportunityId } }, { merge: true });
+    await userRef.set({ ghl: { contactId, opportunityId: oppId || data.ghl?.opportunityId } }, { merge: true });
     return res.status(200).json({ ok: true, contactId });
   } catch (error) {
     console.error('ghl/sync error', error);
