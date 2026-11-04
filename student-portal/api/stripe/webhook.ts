@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type Stripe from 'stripe';
-import { getStripe } from '../_lib/stripe';
-import { adminDb } from '../_lib/firebaseAdmin';
-import { ghlConfigured, upsertContact, moveToStage, stageIdFor } from '../_lib/ghl';
+import { getStripe } from '../_lib/stripe.js';
+import { adminDb } from '../_lib/firebaseAdmin.js';
+import { ghlConfigured, upsertContact, moveToStage, stageIdFor } from '../_lib/ghl.js';
 
 // Necesario: el webhook de Stripe requiere el body crudo para validar la firma.
 export const config = { api: { bodyParser: false } };

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { verifyAuth } from '../_lib/auth';
-import { adminDb } from '../_lib/firebaseAdmin';
-import { ghlConfigured, upsertContact, moveToStage, stageIdFor } from '../_lib/ghl';
+import { verifyAuth } from '../_lib/auth.js';
+import { adminDb } from '../_lib/firebaseAdmin.js';
+import { ghlConfigured, upsertContact, moveToStage, stageIdFor } from '../_lib/ghl.js';
 
 // Best-effort: sincroniza el alumno con GHL (contacto + etapa de pipeline).
 export default async function handler(req: VercelRequest, res: VercelResponse) {

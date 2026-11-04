@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getGenAI, MODEL } from '../_lib/gemini';
-import { verifyAuth } from '../_lib/auth';
-import { adminDb, adminStorage } from '../_lib/firebaseAdmin';
+import { getGenAI, MODEL } from '../_lib/gemini.js';
+import { verifyAuth } from '../_lib/auth.js';
+import { adminDb, adminStorage } from '../_lib/firebaseAdmin.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {

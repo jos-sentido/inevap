@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getStripe } from '../_lib/stripe';
-import { verifyAuth } from '../_lib/auth';
-import { adminDb } from '../_lib/firebaseAdmin';
-import { PLANS, DEFAULT_PLAN } from '../_lib/plans';
+import { getStripe } from '../_lib/stripe.js';
+import { verifyAuth } from '../_lib/auth.js';
+import { adminDb } from '../_lib/firebaseAdmin.js';
+import { PLANS, DEFAULT_PLAN } from '../_lib/plans.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
