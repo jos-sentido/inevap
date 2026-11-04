@@ -239,6 +239,27 @@ const StudentDetail: React.FC<{ uid: string; onClose: () => void; onSaved: () =>
               </Section>
             )}
 
+            {data.student.attribution && (
+              <Section title="Origen (marketing)">
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {([['utmSource', 'Fuente'], ['utmMedium', 'Medio'], ['utmCampaign', 'Campaña'], ['utmContent', 'Anuncio'], ['utmTerm', 'Término']] as [string, string][])
+                    .filter(([k]) => data.student.attribution[k])
+                    .map(([k, lbl]) => (
+                      <div key={k} className="bg-blue-50/60 rounded-xl px-3 py-2">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{lbl}</p>
+                        <p className="font-bold text-slate-700 break-words">{data.student.attribution[k]}</p>
+                      </div>
+                    ))}
+                  {(data.student.attribution.gclid || data.student.attribution.fbclid) && (
+                    <div className="bg-blue-50/60 rounded-xl px-3 py-2">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Click ID</p>
+                      <p className="font-bold text-slate-700">{data.student.attribution.gclid ? 'Google Ads' : 'Meta Ads'}</p>
+                    </div>
+                  )}
+                </div>
+              </Section>
+            )}
+
             <Section title="Documentos">
               {data.documents.length === 0 ? <Empty>Sin documentos subidos.</Empty> : (
                 <div className="space-y-2">

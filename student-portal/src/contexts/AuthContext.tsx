@@ -16,6 +16,7 @@ import {
 } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import { authedPostJSON } from '../lib/api';
+import { getAttribution } from '../lib/attribution';
 import { UserProfile, UserRole, StageStatus, ProfessionalProfile } from '../types';
 
 interface AuthContextValue {
@@ -89,8 +90,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentStage: 0,
         stageStatus: { '0': StageStatus.IN_PROGRESS },
       };
+      const attribution = getAttribution();
       await setDoc(doc(db, 'users', cred.user.uid), {
         ...newProfile,
+        ...(attribution ? { attribution } : {}),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });

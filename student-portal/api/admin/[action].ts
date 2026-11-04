@@ -26,6 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             city: u.city || '', licenciatura: u.licenciatura || '', currentStage: u.currentStage ?? 0,
             role: u.role || 'ALUMNO', totalAbonado: u.payment?.totalAbonado ?? 0,
             lead: u.lead || { status: 'active' }, preQual: u.preQual || null,
+            attribution: u.attribution || null,
             createdAt: iso(u.createdAt),
           };
         });
@@ -63,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             uid, name: u.name, email: u.email, curp: u.curp, phone: u.phone, city: u.city,
             licenciatura: u.licenciatura, currentStage: u.currentStage ?? 0,
             stageStatus: u.stageStatus || {}, professionalProfile: u.professionalProfile || null,
-            preQual: u.preQual || null,
+            preQual: u.preQual || null, attribution: u.attribution || null,
             payment: u.payment || { totalAbonado: 0 }, ghl: u.ghl || null,
           },
           documents,
