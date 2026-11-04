@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, UserPlus, Loader2, X, FileText, ExternalLink, Search, Save, CheckCircle2 } from 'lucide-react';
+import { Users, UserPlus, Loader2, X, FileText, ExternalLink, Search, Save, CheckCircle2, MessageCircle, MapPin } from 'lucide-react';
 import { authedGetJSON, authedPostJSON } from '../../lib/api';
 import { STAGES_CONFIG, LICENCIATURAS } from '../../constants';
 
@@ -213,6 +213,31 @@ const StudentDetail: React.FC<{ uid: string; onClose: () => void; onSaved: () =>
               </div>
               <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X size={22} /></button>
             </div>
+
+            <Section title="Contacto">
+              <div className="space-y-2 text-sm bg-slate-50 rounded-xl px-4 py-3">
+                {data.student.phone
+                  ? <a href={`https://wa.me/52${String(data.student.phone).replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-emerald-700 font-bold hover:underline"><MessageCircle size={16} /> {data.student.phone}</a>
+                  : <p className="text-slate-400">Sin teléfono</p>}
+                {data.student.city && <p className="text-slate-600 flex items-center gap-2"><MapPin size={14} className="text-slate-400" /> {data.student.city}</p>}
+                {data.student.curp && <p className="text-slate-400 text-xs">CURP: {data.student.curp}</p>}
+              </div>
+            </Section>
+
+            {data.student.preQual && (
+              <Section title="Precalificación">
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {([['bachillerato', 'Bachillerato'], ['experiencia', 'Experiencia'], ['titularseCuando', 'Quiere titularse'], ['comoConociste', 'Nos conoció por']] as [string, string][])
+                    .filter(([k]) => data.student.preQual[k])
+                    .map(([k, lbl]) => (
+                      <div key={k} className="bg-slate-50 rounded-xl px-3 py-2">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{lbl}</p>
+                        <p className="font-bold text-slate-700">{data.student.preQual[k]}</p>
+                      </div>
+                    ))}
+                </div>
+              </Section>
+            )}
 
             <Section title="Documentos">
               {data.documents.length === 0 ? <Empty>Sin documentos subidos.</Empty> : (

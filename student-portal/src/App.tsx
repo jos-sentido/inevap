@@ -219,7 +219,9 @@ const Portal: React.FC = () => {
       `}>
         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#2B5299] rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md">I</div>
+            <div className="w-10 h-10 rounded-lg overflow-hidden shadow-md bg-[#2B5299] shrink-0">
+              <img src="/logo-inevap.jpg" alt="INEVAP" className="w-full h-full object-cover object-top scale-[1.7]" />
+            </div>
             <span className="font-bold text-xl tracking-tight text-[#2B5299]">INEVAP</span>
           </div>
         </div>

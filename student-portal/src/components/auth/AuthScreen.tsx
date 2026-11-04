@@ -53,9 +53,8 @@ const AuthScreen: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-white to-blue-50 p-4">
       <div className="w-full max-w-md">
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-[#2B5299] rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">I</div>
-          <span className="font-black text-2xl tracking-tight text-[#2B5299]">INEVAP</span>
+        <div className="flex items-center justify-center mb-8">
+          <img src="/logo-inevap.jpg" alt="INEVAP" className="w-24 h-24 rounded-3xl shadow-xl shadow-blue-200 object-cover" />
         </div>
 
         <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-blue-100 border border-slate-200 p-8 md:p-10">

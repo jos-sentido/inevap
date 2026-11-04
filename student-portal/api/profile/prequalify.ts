@@ -9,10 +9,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const user = await verifyAuth(req);
   if (!user) return res.status(401).json({ error: 'No autorizado' });
 
-  const { professionalProfile, preQual, licenciatura } = (req.body || {}) as {
+  const { professionalProfile, preQual, licenciatura, phone, city } = (req.body || {}) as {
     professionalProfile?: { yearsExp?: string; currentRole?: string; industry?: string };
     preQual?: Record<string, string>;
     licenciatura?: string;
+    phone?: string;
+    city?: string;
   };
 
   try {
@@ -31,6 +33,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (professionalProfile) updates.professionalProfile = professionalProfile;
     if (preQual) updates.preQual = preQual;
     if (licenciatura) updates.licenciatura = licenciatura;
+    if (phone) updates.phone = phone;
+    if (city) updates.city = city;
     await userRef.set(updates, { merge: true });
 
     // Best-effort: actualiza el contacto en GHL con el perfil nuevo
@@ -39,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const contactId = data.ghl?.contactId || (await upsertContact({
           email: data.email || user.email || '',
           name: data.name,
-          phone: data.phone,
+          phone: phone || data.phone,
           licenciatura: licenciatura || data.licenciatura,
         }));
         if (contactId) {

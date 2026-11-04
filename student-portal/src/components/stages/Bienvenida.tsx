@@ -25,6 +25,8 @@ const Bienvenida: React.FC<{ onContinuar: () => void }> = ({ onContinuar }) => {
   const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
+    phone: (prof as any).phone || '',
+    city: (prof as any).city || '',
     licenciatura: prof.licenciatura || LICENCIATURAS[0],
     bachillerato: '',
     experiencia: '',
@@ -48,6 +50,8 @@ const Bienvenida: React.FC<{ onContinuar: () => void }> = ({ onContinuar }) => {
     try {
       await authedPostJSON('/api/profile/prequalify', {
         licenciatura: form.licenciatura,
+        phone: form.phone,
+        city: form.city,
         professionalProfile: { yearsExp: form.yearsExp, currentRole: form.currentRole, industry: form.industry },
         preQual: {
           bachillerato: form.bachillerato,
@@ -119,6 +123,16 @@ const Bienvenida: React.FC<{ onContinuar: () => void }> = ({ onContinuar }) => {
         <h3 className="text-xl font-black text-slate-800 mb-1">Cuéntanos de ti</h3>
         <p className="text-sm text-slate-500 mb-6">Esto personaliza tu Tutor IA y tu proceso.</p>
         <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={label}>WhatsApp / Teléfono *</label>
+              <input type="tel" inputMode="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="10 dígitos" className={input} />
+            </div>
+            <div>
+              <label className={label}>Ciudad</label>
+              <input value={form.city} onChange={(e) => set('city', e.target.value)} placeholder="Ej. Guadalajara" className={input} />
+            </div>
+          </div>
           <div>
             <label className={label}>Carrera de interés</label>
             <select value={form.licenciatura} onChange={(e) => set('licenciatura', e.target.value)} className={input}>
@@ -149,7 +163,8 @@ const Bienvenida: React.FC<{ onContinuar: () => void }> = ({ onContinuar }) => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mt-8">
-          <button onClick={submit} disabled={saving}
+          <button onClick={submit} disabled={saving || form.phone.trim().length < 10}
+            title={form.phone.trim().length < 10 ? 'Ingresa tu WhatsApp / teléfono (10 dígitos)' : 'Continuar'}
             className="flex-1 bg-[#2B5299] text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-900/20 hover:bg-blue-800 transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-sm disabled:opacity-50">
             {saving ? <Loader2 size={18} className="animate-spin" /> : <ArrowRight size={18} />} Continuar a Admisión
           </button>

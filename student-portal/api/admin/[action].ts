@@ -56,9 +56,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         );
         return res.status(200).json({
           student: {
-            uid, name: u.name, email: u.email, curp: u.curp, phone: u.phone,
+            uid, name: u.name, email: u.email, curp: u.curp, phone: u.phone, city: u.city,
             licenciatura: u.licenciatura, currentStage: u.currentStage ?? 0,
             stageStatus: u.stageStatus || {}, professionalProfile: u.professionalProfile || null,
+            preQual: u.preQual || null,
             payment: u.payment || { totalAbonado: 0 }, ghl: u.ghl || null,
           },
           documents,
