@@ -15,6 +15,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
+import { authedPostJSON } from '../lib/api';
 import { UserProfile, UserRole, StageStatus, ProfessionalProfile } from '../types';
 
 interface AuthContextValue {
@@ -94,6 +95,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: serverTimestamp(),
       });
       setProfile(newProfile);
+      // Best-effort: crea/actualiza el contacto en GHL (no bloquea el registro)
+      authedPostJSON('/api/ghl/sync', {}).catch(() => {});
     },
     [],
   );

@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type Stripe from 'stripe';
 import { getStripe } from '../_lib/stripe';
 import { adminDb } from '../_lib/firebaseAdmin';
+import { ghlConfigured, upsertContact, moveToStage, stageIdFor } from '../_lib/ghl';
 
 // Necesario: el webhook de Stripe requiere el body crudo para validar la firma.
 export const config = { api: { bodyParser: false } };
@@ -53,6 +54,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
           { merge: true },
         );
+
+        // Best-effort: mueve la etapa en GHL
+        if (ghlConfigured()) {
+          try {
+            const userSnap = await db.doc(`users/${uid}`).get();
+            const u = (userSnap.data() || {}) as any;
+            const contactId = u.ghl?.contactId || (await upsertContact({ email: u.email, name: u.name, licenciatura: u.licenciatura }));
+            const stageId = stageIdFor(2);
+            if (contactId && stageId) {
+              const oppId = await moveToStage({ contactId, stageId, opportunityId: u.ghl?.opportunityId, name: u.name || u.email || 'Alumno INEVAP' });
+              await db.doc(`users/${uid}`).set({ ghl: { contactId, opportunityId: oppId || u.ghl?.opportunityId } }, { merge: true });
+            }
+          } catch (e) {
+            console.error('GHL move en webhook falló (no bloqueante)', e);
+          }
+        }
       }
     }
     return res.status(200).json({ received: true });
