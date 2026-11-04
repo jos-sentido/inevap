@@ -19,11 +19,13 @@ import {
   Save,
   Zap,
   ClipboardCheck,
-  Briefcase
+  Briefcase,
+  Download
 } from 'lucide-react';
 import { STAGES_CONFIG, LICENCIATURAS } from './constants';
 import { Message, ProfessionalProfile } from './types';
 import { getAIResponse, verifyDocumentWithAI, getStudyTutorResponse } from './services/geminiService';
+import { authedPostJSON } from './lib/api';
 import { useAuth } from './contexts/AuthContext';
 import AuthScreen from './components/auth/AuthScreen';
 import Agendado from './components/stages/Agendado';
@@ -65,6 +67,21 @@ const Portal: React.FC = () => {
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [memoriaPdfLoading, setMemoriaPdfLoading] = useState(false);
+
+  const handleGenerateMemoriaPdf = async () => {
+    setMemoriaPdfLoading(true);
+    try {
+      const { url } = await authedPostJSON<{ url: string }>('/api/memoria/pdf', { messages });
+      if (url) window.open(url, '_blank');
+      else throw new Error('sin url');
+    } catch (e) {
+      console.error(e);
+      alert('No se pudo generar el PDF de tu memoria. Intenta de nuevo.');
+    } finally {
+      setMemoriaPdfLoading(false);
+    }
+  };
 
   // Guías (temarios) cargadas desde Firestore (para el contexto del Tutor IA)
   const [guides, setGuides] = useState<Record<string, string>>({});
@@ -486,6 +503,15 @@ const Portal: React.FC = () => {
                       <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest mt-1">Perfil: {professional.currentRole || 'Profesional'}</p>
                     </div>
                   </div>
+                  <button
+                    onClick={handleGenerateMemoriaPdf}
+                    disabled={memoriaPdfLoading || messages.length < 2}
+                    title={messages.length < 2 ? 'Conversa primero con el asistente' : 'Generar PDF de tu Memoria'}
+                    className="bg-[#2B5299] text-white text-xs font-black uppercase tracking-widest px-4 py-2.5 rounded-xl hover:bg-blue-800 transition-all flex items-center gap-2 disabled:opacity-40"
+                  >
+                    {memoriaPdfLoading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                    {memoriaPdfLoading ? 'Generando...' : 'Descargar PDF'}
+                  </button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-10 space-y-8 bg-slate-50/20 custom-scrollbar">
                   {messages.map((msg, idx) => (
