@@ -73,3 +73,19 @@ export interface Exam {
   scheduledAt: string; // ISO
   status: 'booked' | 'completed' | 'cancelled';
 }
+
+export type CertStepStatus = 'pendiente' | 'en_proceso' | 'completado';
+
+export interface CertStep {
+  title: string;
+  description?: string;
+  status: CertStepStatus;
+  date?: string; // ISO
+}
+
+export interface Certification {
+  status: 'en_proceso' | 'completado';
+  steps: CertStep[];
+  folio?: string;
+  updatedAt?: string;
+}

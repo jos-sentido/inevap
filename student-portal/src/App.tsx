@@ -27,6 +27,7 @@ import { getAIResponse, verifyDocumentWithAI, getStudyTutorResponse } from './se
 import { useAuth } from './contexts/AuthContext';
 import AuthScreen from './components/auth/AuthScreen';
 import Agendado from './components/stages/Agendado';
+import Certificacion from './components/stages/Certificacion';
 import { db, storage } from './lib/firebase';
 import { collection, getDocs, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes } from 'firebase/storage';
@@ -583,6 +584,9 @@ const Portal: React.FC = () => {
             ) : activeStage === 4 ? (
               /* ETAPA 4: AGENDADO DE EXÁMENES */
               <Agendado />
+            ) : activeStage === 5 ? (
+              /* ETAPA 5: CERTIFICACIÓN */
+              <Certificacion />
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="w-24 h-24 bg-white rounded-[2rem] shadow-xl flex items-center justify-center text-slate-300 mb-8 border border-slate-100">{currentStageInfo.icon}</div>
