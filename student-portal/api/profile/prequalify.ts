@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { verifyAuth } from '../_lib/auth.js';
 import { adminDb } from '../_lib/firebaseAdmin.js';
 import { ghlConfigured, upsertContact, moveToStage } from '../_lib/ghl.js';
+import { logActivity } from '../_lib/crm.js';
 
 // Etapa 0: guarda el perfilamiento (precalificación) y avanza a Admisión.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -36,6 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (phone) updates.phone = phone;
     if (city) updates.city = city;
     await userRef.set(updates, { merge: true });
+    await logActivity(user.uid, 'prequalified', 'Completó el perfilamiento y avanzó a Admisión');
 
     // Best-effort: actualiza el contacto en GHL con el perfil nuevo
     if (ghlConfigured()) {

@@ -25,7 +25,8 @@ import {
   CalendarDays,
   Eye,
   ArrowLeft,
-  Target
+  Target,
+  UserCog
 } from 'lucide-react';
 import { STAGES_CONFIG, LICENCIATURAS } from './constants';
 import { Message, ProfessionalProfile } from './types';
@@ -41,6 +42,7 @@ import StudentsPanel from './components/admin/StudentsPanel';
 import ExamsPanel from './components/admin/ExamsPanel';
 import GuidesPanel from './components/admin/GuidesPanel';
 import ProspectsPanel from './components/admin/ProspectsPanel';
+import TeamPanel from './components/admin/TeamPanel';
 import { db, storage } from './lib/firebase';
 import { collection, getDocs, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes } from 'firebase/storage';
@@ -48,15 +50,16 @@ import { ref as storageRef, uploadBytes } from 'firebase/storage';
 const emptyProfile: ProfessionalProfile = { yearsExp: '', currentRole: '', industry: '' };
 
 const Portal: React.FC = () => {
-  const { profile, isAdmin, logout, updateProfessionalProfile } = useAuth();
+  const { profile, isAdmin, isSales, logout, updateProfessionalProfile } = useAuth();
   const prof = profile!; // garantizado por <App/>
+  const isStaff = isAdmin || isSales;
   const licenciatura = prof.licenciatura || 'General';
   const professional = prof.professionalProfile || emptyProfile;
 
   const [previewStudent, setPreviewStudent] = useState(false);
-  const [adminModule, setAdminModule] = useState<'prospectos' | 'alumnos' | 'examenes' | 'temarios'>('prospectos');
+  const [adminModule, setAdminModule] = useState<'prospectos' | 'alumnos' | 'examenes' | 'temarios' | 'equipo'>('prospectos');
   const [activeStage, setActiveStage] = useState(0);
-  const showAdmin = isAdmin && !previewStudent;
+  const showAdmin = isStaff && !previewStudent;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Formulario de perfil profesional (persistido en Firestore al salir del campo)
@@ -203,12 +206,15 @@ const Portal: React.FC = () => {
 
   const currentStageInfo = STAGES_CONFIG[activeStage];
 
-  const ADMIN_MODULES = [
-    { id: 'prospectos' as const, title: 'Prospectos', subtitle: 'Pipeline', icon: <Target size={20} /> },
-    { id: 'alumnos' as const, title: 'Alumnos', subtitle: 'Gestión', icon: <Users size={20} /> },
-    { id: 'examenes' as const, title: 'Exámenes', subtitle: 'Agenda', icon: <CalendarDays size={20} /> },
-    { id: 'temarios' as const, title: 'Temarios', subtitle: 'Tutor IA', icon: <Database size={20} /> },
+  const ALL_MODULES = [
+    { id: 'prospectos' as const, title: 'Prospectos', subtitle: 'Pipeline', icon: <Target size={20} />, sales: true },
+    { id: 'alumnos' as const, title: 'Alumnos', subtitle: 'Gestión', icon: <Users size={20} />, sales: false },
+    { id: 'examenes' as const, title: 'Exámenes', subtitle: 'Agenda', icon: <CalendarDays size={20} />, sales: false },
+    { id: 'temarios' as const, title: 'Temarios', subtitle: 'Tutor IA', icon: <Database size={20} />, sales: false },
+    { id: 'equipo' as const, title: 'Equipo', subtitle: 'Ventas', icon: <UserCog size={20} />, sales: false },
   ];
+  // Vendedor (no admin): solo módulos comerciales.
+  const ADMIN_MODULES = isAdmin ? ALL_MODULES : ALL_MODULES.filter((m) => m.sales);
   const adminModuleTitle = ADMIN_MODULES.find((m) => m.id === adminModule)?.title || '';
 
   return (
@@ -247,18 +253,20 @@ const Portal: React.FC = () => {
                   </div>
                 </button>
               ))}
-              <div className="pt-4 mt-4 border-t border-slate-100">
-                <button
-                  onClick={() => { setPreviewStudent(true); setActiveStage(0); setIsSidebarOpen(false); }}
-                  className="w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all hover:bg-slate-100 text-slate-600 border border-dashed border-slate-200"
-                >
-                  <Eye size={20} className="text-[#2B5299]" />
-                  <div className="flex-1 text-left">
-                    <p className="text-sm font-bold leading-none mb-1 text-slate-800">Ver como alumno</p>
-                    <p className="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Vista previa del portal</p>
-                  </div>
-                </button>
-              </div>
+              {isAdmin && (
+                <div className="pt-4 mt-4 border-t border-slate-100">
+                  <button
+                    onClick={() => { setPreviewStudent(true); setActiveStage(0); setIsSidebarOpen(false); }}
+                    className="w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all hover:bg-slate-100 text-slate-600 border border-dashed border-slate-200"
+                  >
+                    <Eye size={20} className="text-[#2B5299]" />
+                    <div className="flex-1 text-left">
+                      <p className="text-sm font-bold leading-none mb-1 text-slate-800">Ver como alumno</p>
+                      <p className="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Vista previa del portal</p>
+                    </div>
+                  </button>
+                </div>
+              )}
             </>
           ) : (
             <>
@@ -312,7 +320,7 @@ const Portal: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-             {showAdmin && <span className="bg-indigo-100 text-indigo-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Admin Access</span>}
+             {showAdmin && <span className="bg-indigo-100 text-indigo-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{isAdmin ? 'Admin Access' : 'Ventas'}</span>}
              {isAdmin && previewStudent && (
                <button onClick={() => setPreviewStudent(false)} className="bg-indigo-50 text-indigo-700 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest flex items-center gap-1.5 hover:bg-indigo-100 transition-all">
                  <Eye size={12} /> Vista previa · Salir
@@ -330,6 +338,7 @@ const Portal: React.FC = () => {
               adminModule === 'prospectos' ? <ProspectsPanel /> :
               adminModule === 'alumnos' ? <StudentsPanel /> :
               adminModule === 'examenes' ? <ExamsPanel /> :
+              adminModule === 'equipo' ? <TeamPanel /> :
               <GuidesPanel />
             ) : activeStage === 0 ? (
               /* ETAPA 0: BIENVENIDA / PERFILAMIENTO */

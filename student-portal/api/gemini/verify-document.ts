@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getGenAI, MODEL } from '../_lib/gemini.js';
 import { verifyAuth } from '../_lib/auth.js';
 import { adminDb, adminStorage } from '../_lib/firebaseAdmin.js';
+import { logActivity } from '../_lib/crm.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -62,6 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
       { merge: true },
     );
+    await logActivity(user.uid, 'document', `Subió "${expectedDocName}" (${result.isValid ? 'validado' : 'rechazado'})`);
 
     return res.status(200).json(result);
   } catch (error) {

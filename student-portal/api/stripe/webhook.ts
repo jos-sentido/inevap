@@ -3,6 +3,7 @@ import type Stripe from 'stripe';
 import { getStripe } from '../_lib/stripe.js';
 import { adminDb } from '../_lib/firebaseAdmin.js';
 import { ghlConfigured, upsertContact, moveToStage } from '../_lib/ghl.js';
+import { logActivity } from '../_lib/crm.js';
 
 // Necesario: el webhook de Stripe requiere el body crudo para validar la firma.
 export const config = { api: { bodyParser: false } };
@@ -45,15 +46,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
           { merge: true },
         );
-        // Avanza a la etapa de Estudio (índice 3) tras el pago
+        // Avanza a la etapa de Estudio (índice 3) tras el pago + marca GANADO
         await db.doc(`users/${uid}`).set(
           {
             currentStage: 3,
             stageStatus: { '2': 'COMPLETED', '3': 'IN_PROGRESS' },
+            lead: { status: 'won', wonAt: new Date() },
             updatedAt: new Date(),
           },
           { merge: true },
         );
+        await logActivity(uid, 'enrolled', 'Se inscribió (pago confirmado) — oportunidad ganada');
 
         // Best-effort: mueve la etapa en GHL
         if (ghlConfigured()) {

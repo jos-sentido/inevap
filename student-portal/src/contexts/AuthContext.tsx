@@ -23,6 +23,7 @@ interface AuthContextValue {
   firebaseUser: FirebaseUser | null;
   profile: UserProfile | null;
   isAdmin: boolean;
+  isSales: boolean;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (data: {
@@ -48,6 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSales, setIsSales] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,6 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const tokenResult = await fbUser.getIdTokenResult();
           setIsAdmin(tokenResult.claims.admin === true);
+          setIsSales(tokenResult.claims.sales === true);
           const existing = await loadProfile(fbUser.uid);
           setProfile(existing);
         } catch (e) {
@@ -66,6 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         setProfile(null);
         setIsAdmin(false);
+        setIsSales(false);
       }
       setLoading(false);
     });
@@ -98,8 +102,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: serverTimestamp(),
       });
       setProfile(newProfile);
-      // Best-effort: crea/actualiza el contacto en GHL (no bloquea el registro)
-      authedPostJSON('/api/ghl/sync', {}).catch(() => {});
+      // Best-effort: asignación round-robin + GHL + historial (no bloquea el registro)
+      authedPostJSON('/api/crm/onboard', {}).catch(() => {});
     },
     [],
   );
@@ -134,6 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     firebaseUser,
     profile,
     isAdmin,
+    isSales,
     loading,
     login,
     register,

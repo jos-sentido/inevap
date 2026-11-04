@@ -14,3 +14,17 @@ export async function requireAdmin(req: VercelRequest, res: VercelResponse): Pro
   }
   return user;
 }
+
+/** Staff = administrador o vendedor (claim sales). */
+export async function requireStaff(req: VercelRequest, res: VercelResponse): Promise<AuthedUser | null> {
+  const user = await verifyAuth(req);
+  if (!user) {
+    res.status(401).json({ error: 'No autorizado' });
+    return null;
+  }
+  if (!user.admin && !user.sales) {
+    res.status(403).json({ error: 'Requiere permisos de staff' });
+    return null;
+  }
+  return user;
+}
