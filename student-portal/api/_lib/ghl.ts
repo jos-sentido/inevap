@@ -51,6 +51,9 @@ export async function upsertContact(input: UpsertContactInput): Promise<string |
 interface Pipeline { id: string; name: string; stages: { id: string; name: string }[] }
 let pipelineCache: Pipeline | null = null;
 
+// Normaliza nombres ignorando emojis, espacios y símbolos (conserva letras/números).
+const norm = (s: string) => (s || '').toLowerCase().normalize('NFKD').replace(/[^\p{L}\p{N}]+/gu, '');
+
 /** Obtiene el pipeline objetivo (por GHL_PIPELINE_ID o GHL_PIPELINE_NAME). */
 async function getPipeline(): Promise<Pipeline | null> {
   if (pipelineCache) return pipelineCache;
@@ -63,10 +66,11 @@ async function getPipeline(): Promise<Pipeline | null> {
   const data = (await res.json()) as { pipelines?: Pipeline[] };
   const pipelines = data.pipelines || [];
   const byId = process.env.GHL_PIPELINE_ID;
-  const byName = (process.env.GHL_PIPELINE_NAME || '').toLowerCase();
+  const byName = norm(process.env.GHL_PIPELINE_NAME || '');
   const found =
     (byId && pipelines.find((p) => p.id === byId)) ||
-    (byName && pipelines.find((p) => p.name.toLowerCase() === byName)) ||
+    (byName && pipelines.find((p) => norm(p.name) === byName)) ||
+    (byName && pipelines.find((p) => norm(p.name).includes(byName) || byName.includes(norm(p.name)))) ||
     pipelines[0] ||
     null;
   pipelineCache = found || null;
@@ -85,7 +89,10 @@ export async function resolveStage(stageIndex: number): Promise<{ pipelineId: st
   if (!stageName) return null;
   const pipeline = await getPipeline();
   if (!pipeline) return null;
-  const stage = pipeline.stages.find((s) => s.name.toLowerCase() === stageName.toLowerCase());
+  const target = norm(stageName);
+  const stage =
+    pipeline.stages.find((s) => norm(s.name) === target) ||
+    pipeline.stages.find((s) => norm(s.name).includes(target) || target.includes(norm(s.name)));
   if (!stage) {
     console.error(`GHL: stage "${stageName}" no encontrado en pipeline "${pipeline.name}"`);
     return null;

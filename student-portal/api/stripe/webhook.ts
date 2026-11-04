@@ -63,7 +63,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const contactId = u.ghl?.contactId || (await upsertContact({ email: u.email, name: u.name, licenciatura: u.licenciatura }));
             if (contactId) {
               const oppId = await moveToStage({ contactId, stageIndex: 2, opportunityId: u.ghl?.opportunityId, name: u.name || u.email || 'Alumno INEVAP' });
-              await db.doc(`users/${uid}`).set({ ghl: { contactId, opportunityId: oppId || u.ghl?.opportunityId } }, { merge: true });
+              const ghlData: Record<string, string> = { contactId };
+              const opp = oppId || u.ghl?.opportunityId;
+              if (opp) ghlData.opportunityId = opp;
+              await db.doc(`users/${uid}`).set({ ghl: ghlData }, { merge: true });
             }
           } catch (e) {
             console.error('GHL move en webhook falló (no bloqueante)', e);

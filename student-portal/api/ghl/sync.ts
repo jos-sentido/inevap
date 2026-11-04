@@ -42,7 +42,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       name: data.name || data.email || 'Alumno INEVAP',
     });
 
-    await userRef.set({ ghl: { contactId, opportunityId: oppId || data.ghl?.opportunityId } }, { merge: true });
+    const ghlData: Record<string, string> = { contactId };
+    const opp = oppId || data.ghl?.opportunityId;
+    if (opp) ghlData.opportunityId = opp;
+    await userRef.set({ ghl: ghlData }, { merge: true });
     return res.status(200).json({ ok: true, contactId });
   } catch (error) {
     console.error('ghl/sync error', error);
