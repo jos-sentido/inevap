@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 
-// gemini-2.5-flash es estable; se puede sobreescribir con GEMINI_MODEL.
-export const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+// Modelo por defecto; se puede sobreescribir con GEMINI_MODEL.
+export const MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 
 export type ChatMessage = { role: 'user' | 'model'; text: string };
 
