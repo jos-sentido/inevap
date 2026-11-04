@@ -28,6 +28,7 @@ import { useAuth } from './contexts/AuthContext';
 import AuthScreen from './components/auth/AuthScreen';
 import Agendado from './components/stages/Agendado';
 import Certificacion from './components/stages/Certificacion';
+import Inscripcion from './components/stages/Inscripcion';
 import { db, storage } from './lib/firebase';
 import { collection, getDocs, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes } from 'firebase/storage';
@@ -446,6 +447,9 @@ const Portal: React.FC = () => {
                   </div>
                 </div>
               </div>
+            ) : activeStage === 1 ? (
+              /* ETAPA 1: INSCRIPCIÓN Y PAGO */
+              <Inscripcion />
             ) : activeStage === 2 ? (
               /* SECCIÓN DE ESTUDIO (TUTOR IA ADAPTATIVO) */
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full min-h-[700px] animate-in slide-in-from-bottom-6 duration-700">
