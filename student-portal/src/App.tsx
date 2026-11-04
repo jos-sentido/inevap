@@ -27,8 +27,9 @@ import { getAIResponse, verifyDocumentWithAI, getStudyTutorResponse } from './se
 import { useAuth } from './contexts/AuthContext';
 import AuthScreen from './components/auth/AuthScreen';
 import Agendado from './components/stages/Agendado';
-import { db } from './lib/firebase';
-import { collection, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { db, storage } from './lib/firebase';
+import { collection, getDocs, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { ref as storageRef, uploadBytes } from 'firebase/storage';
 
 const emptyProfile: ProfessionalProfile = { yearsExp: '', currentRole: '', industry: '' };
 
@@ -138,33 +139,53 @@ const Portal: React.FC = () => {
     setIsTyping(false);
   };
 
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result?.toString().split(',')[1] || '');
-      reader.onerror = error => reject(error);
-    });
-  };
-
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, {
     status: 'uploading' | 'verifying' | 'success' | 'error',
     fileName?: string,
     errorMsg?: string
   }>>({});
 
+  // Refleja el estado de documentos desde Firestore (verificación la escribe el servidor)
+  useEffect(() => {
+    if (!prof.uid) return;
+    const unsub = onSnapshot(collection(db, 'users', prof.uid, 'documents'), (snap) => {
+      setUploadedDocs((prev) => {
+        const next = { ...prev };
+        snap.forEach((d) => {
+          const data = d.data() as { status?: string; fileName?: string; verification?: { reason?: string } };
+          if (data.status === 'valid') next[d.id] = { status: 'success', fileName: data.fileName };
+          else if (data.status === 'invalid') next[d.id] = { status: 'error', fileName: data.fileName, errorMsg: data.verification?.reason };
+          else if (data.status === 'verifying' && next[d.id]?.status !== 'uploading') next[d.id] = { status: 'verifying', fileName: data.fileName };
+        });
+        return next;
+      });
+    });
+    return unsub;
+  }, [prof.uid]);
+
   const handleDocumentUpload = async (docId: string, docName: string, file: File) => {
     setUploadedDocs(prev => ({ ...prev, [docId]: { status: 'uploading', fileName: file.name } }));
     try {
-      const base64 = await convertToBase64(file);
-      const aiResult = await verifyDocumentWithAI(base64, file.type, docName);
+      const path = `users/${prof.uid}/documents/${docId}`;
+      await uploadBytes(storageRef(storage, path), file, { contentType: file.type });
+      await setDoc(doc(db, 'users', prof.uid, 'documents', docId), {
+        type: docName,
+        storagePath: path,
+        fileName: file.name,
+        mimeType: file.type,
+        status: 'verifying',
+        uploadedAt: serverTimestamp(),
+      });
+      setUploadedDocs(prev => ({ ...prev, [docId]: { status: 'verifying', fileName: file.name } }));
+      const aiResult = await verifyDocumentWithAI(path, docId, file.type, docName);
       if (aiResult.isValid) {
         setUploadedDocs(prev => ({ ...prev, [docId]: { status: 'success', fileName: file.name } }));
       } else {
-        setUploadedDocs(prev => ({ ...prev, [docId]: { status: 'error', errorMsg: aiResult.reason } }));
+        setUploadedDocs(prev => ({ ...prev, [docId]: { status: 'error', fileName: file.name, errorMsg: aiResult.reason } }));
       }
     } catch (error) {
-      setUploadedDocs(prev => ({ ...prev, [docId]: { status: 'error', errorMsg: 'Error de conexión.' } }));
+      console.error('Error al subir documento', error);
+      setUploadedDocs(prev => ({ ...prev, [docId]: { status: 'error', errorMsg: 'Error al subir el documento.' } }));
     }
   };
 
@@ -351,10 +372,10 @@ const Portal: React.FC = () => {
                                   <p className="text-[10px] font-black text-emerald-700 uppercase">{doc.name}</p>
                                   <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500">Validado ✓</span>
                                 </div>
-                              ) : status === 'uploading' ? (
+                              ) : status === 'uploading' || status === 'verifying' ? (
                                 <div className="text-center">
                                   <Loader2 className="animate-spin text-blue-600 mb-2 mx-auto" />
-                                  <p className="text-[10px] font-black text-blue-600 uppercase tracking-tighter">Analizando...</p>
+                                  <p className="text-[10px] font-black text-blue-600 uppercase tracking-tighter">{status === 'uploading' ? 'Subiendo...' : 'Analizando...'}</p>
                                 </div>
                               ) : (
                                 <>

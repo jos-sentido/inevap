@@ -30,12 +30,18 @@ export const getStudyTutorResponse = async (
 };
 
 export const verifyDocumentWithAI = async (
-  base64Data: string,
+  storagePath: string,
+  docId: string,
   mimeType: string,
   expectedDocName: string,
 ): Promise<{ isValid: boolean; reason: string; confidence: number }> => {
   try {
-    return await authedPostJSON('/api/gemini/verify-document', { base64Data, mimeType, expectedDocName });
+    return await authedPostJSON('/api/gemini/verify-document', {
+      storagePath,
+      docId,
+      mimeType,
+      expectedDocName,
+    });
   } catch (error) {
     console.error('Document Verification Error:', error);
     return { isValid: false, reason: 'Error técnico.', confidence: 0 };
