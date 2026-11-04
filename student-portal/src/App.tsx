@@ -29,6 +29,7 @@ import AuthScreen from './components/auth/AuthScreen';
 import Agendado from './components/stages/Agendado';
 import Certificacion from './components/stages/Certificacion';
 import Inscripcion from './components/stages/Inscripcion';
+import AdminConsole from './components/admin/AdminConsole';
 import { db, storage } from './lib/firebase';
 import { collection, getDocs, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes } from 'firebase/storage';
@@ -65,11 +66,8 @@ const Portal: React.FC = () => {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  // Guías (temarios) cargadas desde Firestore
+  // Guías (temarios) cargadas desde Firestore (para el contexto del Tutor IA)
   const [guides, setGuides] = useState<Record<string, string>>({});
-  const [selectedAdminLic, setSelectedAdminLic] = useState(LICENCIATURAS[0]);
-  const [guideEditorContent, setGuideEditorContent] = useState('');
-  const [isSavingGuide, setIsSavingGuide] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -86,32 +84,6 @@ const Portal: React.FC = () => {
       }
     })();
   }, []);
-
-  useEffect(() => {
-    setGuideEditorContent(guides[selectedAdminLic] || '');
-  }, [selectedAdminLic, guides]);
-
-  const handleSaveGuide = async () => {
-    setIsSavingGuide(true);
-    try {
-      await setDoc(doc(db, 'guides', selectedAdminLic), {
-        licenciatura: selectedAdminLic,
-        content: guideEditorContent,
-        lastUpdated: serverTimestamp(),
-      });
-      setGuides((prev) => ({ ...prev, [selectedAdminLic]: guideEditorContent }));
-      const notification = document.createElement('div');
-      notification.className = "fixed bottom-8 right-8 bg-indigo-600 text-white px-6 py-3 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-4";
-      notification.innerHTML = `<div class="flex items-center gap-2"><span class="font-bold">✓ Guía Guardada:</span> ${selectedAdminLic}</div>`;
-      document.body.appendChild(notification);
-      setTimeout(() => notification.remove(), 3000);
-    } catch (e) {
-      console.error('No se pudo guardar la guía', e);
-      alert('No se pudo guardar la guía. Verifica que tengas permisos de administrador.');
-    } finally {
-      setIsSavingGuide(false);
-    }
-  };
 
   const handleSendStudyMessage = async () => {
     if (!studyInput.trim() || isStudyTyping) return;
@@ -282,54 +254,8 @@ const Portal: React.FC = () => {
           <div className="max-w-6xl mx-auto h-full pb-12">
 
             {isAdminMode && isAdmin ? (
-              /* PANEL DE ADMINISTRACIÓN DE GUÍAS */
-              <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-indigo-100 border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-300 h-full flex flex-col">
-                <div className="p-8 border-b border-slate-100 bg-gradient-to-r from-indigo-50 to-white flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-indigo-200 rotate-3">
-                      <Database size={28} />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Cerebro Central INEVAP</h2>
-                      <p className="text-sm text-slate-500">Carga el conocimiento base para alimentar al Tutor IA de los alumnos.</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-                  <div className="w-full md:w-72 bg-slate-50 border-r border-slate-100 p-6 overflow-y-auto">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Carrera</label>
-                    <div className="space-y-2">
-                      {LICENCIATURAS.map(lic => (
-                        <button
-                          key={lic}
-                          onClick={() => setSelectedAdminLic(lic)}
-                          className={`w-full p-4 rounded-2xl text-xs font-bold text-left transition-all border flex items-center justify-between
-                            ${selectedAdminLic === lic ? 'bg-white border-indigo-600 text-indigo-600 shadow-lg' : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-200/50'}
-                          `}
-                        >
-                          {lic}
-                          {guides[lic] && <Zap size={12} className="text-amber-500" />}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex-1 p-8 flex flex-col gap-6">
-                    <textarea
-                      value={guideEditorContent}
-                      onChange={(e) => setGuideEditorContent(e.target.value)}
-                      placeholder="Carga aquí el temario y bibliografía..."
-                      className="flex-1 w-full p-8 bg-slate-50 border border-slate-200 rounded-[2rem] outline-none focus:ring-4 focus:ring-indigo-100 transition-all font-mono text-sm leading-relaxed resize-none shadow-inner"
-                    />
-                    <button
-                      onClick={handleSaveGuide}
-                      disabled={isSavingGuide}
-                      className="bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-4 uppercase tracking-widest text-sm disabled:opacity-50"
-                    >
-                      {isSavingGuide ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />} Guardar Conocimiento Base
-                    </button>
-                  </div>
-                </div>
-              </div>
+              /* CONSOLA DE ADMINISTRACIÓN */
+              <AdminConsole />
             ) : activeStage === 0 ? (
               /* ETAPA 0: ADMISIÓN Y PERFILAMIENTO */
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
