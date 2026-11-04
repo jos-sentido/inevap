@@ -35,6 +35,7 @@ import AuthScreen from './components/auth/AuthScreen';
 import Agendado from './components/stages/Agendado';
 import Certificacion from './components/stages/Certificacion';
 import Inscripcion from './components/stages/Inscripcion';
+import Bienvenida from './components/stages/Bienvenida';
 import StudentsPanel from './components/admin/StudentsPanel';
 import ExamsPanel from './components/admin/ExamsPanel';
 import GuidesPanel from './components/admin/GuidesPanel';
@@ -325,7 +326,10 @@ const Portal: React.FC = () => {
               adminModule === 'examenes' ? <ExamsPanel /> :
               <GuidesPanel />
             ) : activeStage === 0 ? (
-              /* ETAPA 0: ADMISIÓN Y PERFILAMIENTO */
+              /* ETAPA 0: BIENVENIDA / PERFILAMIENTO */
+              <Bienvenida onContinuar={() => setActiveStage(1)} />
+            ) : activeStage === 1 ? (
+              /* ETAPA 1: ADMISIÓN Y PERFILAMIENTO */
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                   {/* Columna de Documentos */}
@@ -441,10 +445,10 @@ const Portal: React.FC = () => {
                   </div>
                 </div>
               </div>
-            ) : activeStage === 1 ? (
-              /* ETAPA 1: INSCRIPCIÓN Y PAGO */
-              <Inscripcion />
             ) : activeStage === 2 ? (
+              /* ETAPA 2: INSCRIPCIÓN Y PAGO */
+              <Inscripcion />
+            ) : activeStage === 3 ? (
               /* SECCIÓN DE ESTUDIO (TUTOR IA ADAPTATIVO) */
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full min-h-[700px] animate-in slide-in-from-bottom-6 duration-700">
                 <div className="lg:col-span-8 flex flex-col h-full">
@@ -541,7 +545,7 @@ const Portal: React.FC = () => {
                   </div>
                 </div>
               </div>
-            ) : activeStage === 3 ? (
+            ) : activeStage === 4 ? (
               /* SECCIÓN DE MEMORIA */
               <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-200 flex flex-col h-[700px] overflow-hidden">
                  <div className="p-8 border-b border-slate-100 bg-white flex items-center justify-between">
@@ -588,11 +592,11 @@ const Portal: React.FC = () => {
                   </div>
                 </div>
               </div>
-            ) : activeStage === 4 ? (
-              /* ETAPA 4: AGENDADO DE EXÁMENES */
-              <Agendado />
             ) : activeStage === 5 ? (
-              /* ETAPA 5: CERTIFICACIÓN */
+              /* ETAPA 5: AGENDADO DE EXÁMENES */
+              <Agendado />
+            ) : activeStage === 6 ? (
+              /* ETAPA 6: CERTIFICACIÓN */
               <Certificacion />
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">

@@ -45,11 +45,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
           { merge: true },
         );
-        // Avanza a la etapa de Estudio (2) tras el pago
+        // Avanza a la etapa de Estudio (índice 3) tras el pago
         await db.doc(`users/${uid}`).set(
           {
-            currentStage: 2,
-            stageStatus: { '1': 'COMPLETED', '2': 'IN_PROGRESS' },
+            currentStage: 3,
+            stageStatus: { '2': 'COMPLETED', '3': 'IN_PROGRESS' },
             updatedAt: new Date(),
           },
           { merge: true },
@@ -62,7 +62,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const u = (userSnap.data() || {}) as any;
             const contactId = u.ghl?.contactId || (await upsertContact({ email: u.email, name: u.name, licenciatura: u.licenciatura }));
             if (contactId) {
-              const oppId = await moveToStage({ contactId, stageIndex: 2, opportunityId: u.ghl?.opportunityId, name: u.name || u.email || 'Alumno INEVAP' });
+              const oppId = await moveToStage({ contactId, stageIndex: 3, opportunityId: u.ghl?.opportunityId, name: u.name || u.email || 'Alumno INEVAP' });
               const ghlData: Record<string, string> = { contactId };
               const opp = oppId || u.ghl?.opportunityId;
               if (opp) ghlData.opportunityId = opp;
