@@ -30,6 +30,7 @@ interface AuthContextValue {
     email: string;
     password: string;
     name: string;
+    phone?: string;
     curp?: string;
     licenciatura?: string;
   }) => Promise<void>;
@@ -81,13 +82,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const register = useCallback(
-    async (data: { email: string; password: string; name: string; curp?: string; licenciatura?: string }) => {
+    async (data: { email: string; password: string; name: string; phone?: string; curp?: string; licenciatura?: string }) => {
       const cred = await createUserWithEmailAndPassword(auth, data.email, data.password);
       await fbUpdateProfile(cred.user, { displayName: data.name });
       const newProfile: UserProfile = {
         uid: cred.user.uid,
         name: data.name,
         email: data.email,
+        phone: data.phone ?? '',
         curp: data.curp ?? '',
         role: UserRole.ALUMNO,
         licenciatura: data.licenciatura ?? '',

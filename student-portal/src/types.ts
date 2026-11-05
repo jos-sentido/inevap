@@ -35,6 +35,8 @@ export interface UserProfile {
   uid: string;
   name: string;
   email: string;
+  phone?: string;
+  city?: string;
   curp?: string;
   role: UserRole;
   licenciatura?: string;
