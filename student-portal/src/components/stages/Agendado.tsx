@@ -65,7 +65,11 @@ const Agendado: React.FC = () => {
       // onSnapshot actualiza exams; refrescamos conteo local
       setSlots((prev) => prev.map((s) => (s.id === slot.id ? { ...s, booked: s.booked + 1 } : s)));
     } catch (e: any) {
-      setError(e?.message?.includes('409') ? 'Esa fecha ya no está disponible o ya reservaste este examen.' : 'No se pudo reservar. Intenta de nuevo.');
+      setError(
+        e?.message?.includes('409') ? 'Esa fecha ya no está disponible o ya reservaste este examen.'
+        : e?.message?.includes('403') ? 'Aún no alcanzas el abono mínimo requerido para agendar. Completa tu pago para habilitar las fechas.'
+        : 'No se pudo reservar. Intenta de nuevo.',
+      );
     } finally {
       setBooking(null);
     }

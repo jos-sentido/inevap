@@ -14,6 +14,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!slotId) return res.status(400).json({ error: 'Falta slotId' });
 
   const db = adminDb();
+
+  // Gate: requiere un abono mínimo para poder agendar (fuente: Quentli).
+  const MIN_ABONO = Number(process.env.AGENDADO_MIN_ABONO || 13000);
+  const u = (await db.doc(`users/${user.uid}`).get()).data() as any || {};
+  const abonado = u.payment?.totalAbonado ?? 0;
+  if (abonado < MIN_ABONO) {
+    return res.status(403).json({ error: `Para agendar necesitas un abono mínimo de $${MIN_ABONO.toLocaleString('es-MX')}. Llevas $${abonado.toLocaleString('es-MX')}.`, code: 'MIN_ABONO' });
+  }
+
   const slotRef = db.collection('examSlots').doc(slotId);
   const examsCol = db.collection('users').doc(user.uid).collection('exams');
 
