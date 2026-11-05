@@ -1,0 +1,333 @@
+<title>Detonantes de compra INEVAP</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: informe de una columna de lectura; una tabla de decisión arriba y un bloque por ángulo elegido; identidad INEVAP (azul institucional + cian) */
+:root{
+  --bg:#F5F7FB; --surface:#FFFFFF; --ink:#13203A; --ink-2:#44526E; --rule:#D5DCE8;
+  --navy:#2B5299; --cyan:#00ADEF; --cyan-soft:#DDF3FC; --warn:#8A5A00; --warn-bg:#FFF4DC;
+  --ok:#1D6B45; --ok-bg:#DFF3E8; --no:#8C2F2F; --no-bg:#F8E3E3;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1524; --surface:#142036; --ink:#E7EDF8; --ink-2:#A9B6CD; --rule:#2A3954;
+  --navy:#8FB0EE; --cyan:#3CC6F7; --cyan-soft:#12324A; --warn:#F2C46B; --warn-bg:#33270F;
+  --ok:#7FD8A8; --ok-bg:#12321F; --no:#F2A0A0; --no-bg:#3A1A1A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1524; --surface:#142036; --ink:#E7EDF8; --ink-2:#A9B6CD; --rule:#2A3954;
+  --navy:#8FB0EE; --cyan:#3CC6F7; --cyan-soft:#12324A; --warn:#F2C46B; --warn-bg:#33270F;
+  --ok:#7FD8A8; --ok-bg:#12321F; --no:#F2A0A0; --no-bg:#3A1A1A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.read{max-width:68ch}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.1rem,5.5vw,3.4rem);font-weight:800;letter-spacing:-.02em}
+h1 span{color:var(--navy)}
+h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;margin-top:64px;padding-top:24px;border-top:3px solid var(--navy)}
+h3{font-size:1.15rem;font-weight:600;margin-top:24px}
+p{margin:12px 0}
+.kicker{font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy)}
+.lede{font-size:1.2rem;color:var(--ink-2);max-width:62ch}
+.meta{font-size:.85rem;color:var(--ink-2);margin-top:18px}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:36px 0 8px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.fig{padding:20px 20px 20px 0;border-right:1px solid var(--rule);min-width:0}
+.fig:last-child{border-right:0}
+.fig+.fig{padding-left:20px}
+.fig b{display:block;font-family:var(--display);font-size:2.2rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.1}
+.fig span{font-size:.92rem;color:var(--ink-2)}
+@media (max-width:620px){.fig{border-right:0;border-bottom:1px solid var(--rule);padding-left:0!important}.fig:last-child{border-bottom:0}}
+.tbl{overflow-x:auto;margin:18px 0;background:var(--surface);border:1px solid var(--rule)}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:820px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);font-weight:700}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td small{display:block;color:var(--ink-2);font-size:.85rem}
+.v{display:inline-block;font-size:.76rem;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:2px;white-space:nowrap}
+.v.ok{background:var(--ok-bg);color:var(--ok)} .v.mid{background:var(--warn-bg);color:var(--warn)} .v.no{background:var(--no-bg);color:var(--no)}
+.lvl{font-weight:700;white-space:nowrap}
+.angle{padding:28px 0 8px;border-top:1px solid var(--rule);margin-top:28px}
+.angle .rank{font-family:var(--display);font-weight:800;color:var(--navy);font-size:.95rem;letter-spacing:.04em}
+.angle h3{font-size:1.6rem;font-weight:800;margin-top:4px}
+.angle .from{color:var(--ink-2);font-size:.95rem;margin-top:6px}
+.data{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;margin:16px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.data div{padding:12px 14px 12px 0;min-width:0}
+.data b{display:block;font-family:var(--display);font-size:1.45rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
+.data span{font-size:.86rem;color:var(--ink-2)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:0 36px}
+.two>div{min-width:0}
+.slogan{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--ink);margin:14px 0 4px}
+.slogan+small{color:var(--ink-2);font-size:.92rem}
+ul{padding-left:1.2em} li{margin-bottom:6px}
+.kw{font-size:.95rem;color:var(--ink-2)}
+.kw b{color:var(--ink)}
+.note{background:var(--warn-bg);color:var(--ink);border-left:4px solid var(--warn);padding:14px 18px;margin:20px 0;font-size:.96rem}
+.note b{color:var(--warn)}
+.src{font-size:.88rem;color:var(--ink-2)}
+.src li{margin-bottom:8px;word-break:break-word}
+a{color:var(--navy);text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="kicker">INEVAP · Detonantes de compra · Noviembre 2026</div>
+  <h1>Por qué compran <span>y a quién conviene hablarle</span></h1>
+  <p class="lede">Los diez motivos que dan los alumnos de INEVAP, filtrados por tres condiciones: que la persona tenga ingreso propio o ahorro, que el mercado sea grande y que pueda llevar un proceso en línea con dos visitas para los exámenes. Salen seis ángulos además del de la maestría.</p>
+  <p class="meta">Preparado por Sentido para INEVAP. Cifras de INEGI (ENOE 2T-2026, microdatos procesados por Sentido, y Censo 2020), DOF y leyes federales. Complementa el análisis <a href="https://claude.ai/artifact/EzEz6VCP3Lxh5D2uAkQjKQ">Tu maestría empieza en INEVAP</a>.</p>
+</header>
+
+<div class="figs">
+  <div class="fig"><b>11.5 M</b><span>personas de 25 a 64 años sin licenciatura (prepa terminada, técnico o licenciatura trunca) que trabajan hoy</span></div>
+  <div class="fig"><b>5.6 M</b><span>de ellas son asalariadas formales: nómina, IMSS y un área de RH que pide documentos</span></div>
+  <div class="fig"><b>+51 %</b><span>gana en promedio quien terminó la licenciatura frente a quien se quedó en prepa ($17,345 contra $11,457 al mes)</span></div>
+</div>
+<p class="src">Fuente: INEGI, ENOE segundo trimestre 2026, microdatos (tabla SDEM, factor trimestral). Cálculo de Sentido; reproduce los totales oficiales del boletín (60.0 M de ocupados, 55.1 % de informalidad). La ENOE no distingue a quien terminó la licenciatura y nunca se tituló.</p>
+
+<section>
+<h2>La selección</h2>
+<div class="read">
+<p>Agrupamos los diez motivos en ocho ángulos. Dos pares se refieren al mismo momento: la vacante interna y el ascenso con fecha son la misma persona en dos etapas, y jubilarse con título y ser ejemplo para los nietos comparten edad y motivo. El filtro de ingreso deja fuera a quien hoy no trabaja; por eso el ángulo de mamás se limita a las que tienen empleo.</p>
+</div>
+<div class="tbl"><table>
+  <thead><tr><th>Motivo de los alumnos</th><th>Ángulo</th><th class="n">Personas que trabajan</th><th class="n">Ingreso medio</th><th>Urgencia</th><th>Encaje digital</th><th>Veredicto</th></tr></thead>
+  <tbody>
+    <tr><td>Vacante interna que pide título · El cambio de puesto con fecha de entrega</td><td><b>El ascenso</b></td><td class="n">5.57 M<small>asalariados formales</small></td><td class="n">$13,331</td><td class="lvl">Muy alta</td><td>Alto</td><td><span class="v ok">Elegido · 1</span></td></tr>
+    <tr><td>Dejó la licenciatura en pausa y necesita el título para crecer</td><td><b>La carrera en pausa</b></td><td class="n">1.59 M<small>con licenciatura sin terminar</small></td><td class="n">$12,966</td><td class="lvl">Alta</td><td>Alto</td><td><span class="v ok">Elegido · 2</span></td></tr>
+    <tr><td>Quiere cambiar de empresa y sabe que le pedirán el título</td><td><b>El siguiente empleo</b></td><td class="n">8.29 M<small>asalariados; 223 mil buscan cambiar este trimestre</small></td><td class="n">$13,331<small>formales</small></td><td class="lvl">Alta</td><td>Alto</td><td><span class="v ok">Elegido · 3</span></td></tr>
+    <tr><td>Quiere cursar una maestría y le piden el título</td><td><b>La maestría</b></td><td class="n">190–460 mil<small>estimación del análisis anterior</small></td><td class="n">—</td><td class="lvl">Alta</td><td>Alto</td><td><span class="v ok">Elegido · ya analizado</span></td></tr>
+    <tr><td>Dejó la escuela por su familia; quiere demostrarles a sus hijos que sí se puede</td><td><b>Mamá que trabaja</b></td><td class="n">3.60 M<small>madres con empleo; 1.74 M formales</small></td><td class="n">$9,455<small>$12,233 formales</small></td><td class="lvl">Media</td><td>Muy alto</td><td><span class="v ok">Elegido · 4</span><small>solo con empleo</small></td></tr>
+    <tr><td>Está por jubilarse · Quiere ser ejemplo para sus nietos</td><td><b>Antes de jubilarme</b></td><td class="n">1.19 M<small>de 55 a 64 años; 625 mil formales</small></td><td class="n">$11,972<small>$14,669 formales</small></td><td class="lvl">Media, con fecha</td><td>Medio</td><td><span class="v ok">Elegido · 5</span></td></tr>
+    <tr><td>Trabaja en derecho bajo la firma de un compañero y quiere su propia cédula</td><td><b>Mi propia cédula</b></td><td class="n">207 mil<small>profesionistas y técnicos por su cuenta</small></td><td class="n">$14,049</td><td class="lvl">Muy alta</td><td>Alto</td><td><span class="v mid">Nicho de alto valor</span></td></tr>
+    <tr><td>Meta personal: no lo necesita, pero lo quiere</td><td>Meta personal</td><td class="n">11.5 M<small>todo el universo</small></td><td class="n">$11,457</td><td class="lvl">Baja</td><td>Alto</td><td><span class="v no">Fuera como ángulo</span><small>tono de marca</small></td></tr>
+  </tbody>
+</table></div>
+<div class="read">
+<p class="src">Ingreso medio mensual de quienes reportan ingreso (63 % del universo). Asalariados formales: subordinados con prestaciones de ley según la clasificación de empleo de la ENOE. «Profesionistas y técnicos por su cuenta» es un indicador indirecto: empleadores y trabajadores por cuenta propia en ese grupo de ocupación; la ENOE no permite aislar a quien ejerce derecho sin cédula.</p>
+<p><strong>Por qué la meta personal queda fuera.</strong> Tiene ingreso y es el mercado más grande, pero no tiene fecha ni consecuencia: la persona puede posponerlo para siempre, y en pauta eso se traduce en leads caros que no cierran. Sirve como tono de la marca («nunca es tarde», «lo hiciste por ti») y como remate de los testimonios, no como campaña con presupuesto propio.</p>
+<p><strong>Por qué la cédula queda como nicho.</strong> Es el motivo con mayor disposición a pagar: el título le permite cobrar honorarios a su nombre y deja de exponerse a un delito. Pero el mercado es más chico que el resto. Conviene una campaña de búsqueda con presupuesto acotado y landing propia, no una campaña de alcance.</p>
+</div>
+</section>
+
+<section>
+<h2>Seis ángulos para producir</h2>
+
+<div class="angle">
+  <div class="rank">Prioridad 1 · Motivos 1 y 2</div>
+  <h3>El ascenso</h3>
+  <p class="from">«Se abrirá una vacante y necesito el título para aplicar.» «Me dieron el cambio de puesto pero tengo que entregar el título en tal fecha.»</p>
+  <div class="data">
+    <div><b>5.57 M</b><span>asalariados formales sin licenciatura, 25–64</span></div>
+    <div><b>3.39 M</b><span>de ellos tienen entre 30 y 49 años</span></div>
+    <div><b>2.0 M</b><span>en puestos de oficina, profesionales, técnicos o directivos</span></div>
+    <div><b>$13,331</b><span>ingreso medio mensual</span></div>
+  </div>
+  <div class="two">
+    <div>
+      <p><strong>Insight.</strong> La empresa ya decidió que la persona sirve para el puesto. Lo único que falta es un documento, y RH tiene una fecha. Es el comprador con más urgencia de toda la lista y el que menos hay que convencer de su capacidad.</p>
+      <p><strong>Dos momentos, dos mensajes.</strong> Antes de la vacante: anticiparse («cuando se abra, que no te frene el papel»). Con fecha encima: tiempos concretos del proceso y calendario de exámenes, sin prometer fechas de entrega del título que dependen de la SEP.</p>
+      <p class="slogan">Ya te ganaste el puesto. Te falta el título.</p><small>Variante con urgencia: «¿Te pidieron el título para tu nuevo puesto? Empieza este mes.»</small>
+    </div>
+    <div>
+      <p><strong>Hooks</strong></p>
+      <ul>
+        <li>Te ofrecieron el ascenso. RH te pidió el título.</li>
+        <li>Se va a abrir la gerencia y tú ya haces ese trabajo.</li>
+        <li>¿Cuánto tarda sacar un título si ya tienes la experiencia?</li>
+        <li>Tu jefe confía en ti. El sistema de RH pide un documento.</li>
+      </ul>
+      <p class="kw"><b>Keywords:</b> título para ascenso · me piden título en mi trabajo · cuánto tarda sacar un título universitario · título rápido con validez oficial · título por experiencia laboral</p>
+      <p class="kw"><b>Pregunta para LLMs:</b> «Me piden título universitario para un ascenso, ¿cómo lo obtengo rápido y de forma legal?»</p>
+    </div>
+  </div>
+  <p class="kw"><b>Canales:</b> Meta y LinkedIn con segmentación por puesto (supervisores, coordinadores, jefes de área), Search con intención de tiempo. Una línea B2B a explorar: ofrecer a las empresas el proceso para su plantilla, porque RH es quien detona la compra.</p>
+</div>
+
+<div class="angle">
+  <div class="rank">Prioridad 2 · Motivo 10</div>
+  <h3>La carrera en pausa</h3>
+  <p class="from">«Dejé la licenciatura en pausa y para crecer en el ramo necesitaba mi título.»</p>
+  <div class="data">
+    <div><b>1.59 M</b><span>trabajan con la licenciatura sin terminar (ENOE)</span></div>
+    <div><b>943 mil</b><span>de ellos con empleo formal</span></div>
+    <div><b>2.59 M</b><span>personas de 25–64 con 1 a 3 grados de licenciatura (Censo 2020)</span></div>
+    <div><b>$12,966</b><span>ingreso medio; con título serían $17,345</span></div>
+  </div>
+  <div class="two">
+    <div>
+      <p><strong>Insight.</strong> No se siente sin estudios: se siente con algo pendiente. Ya sabe que puede con la escuela, y lleva años ejerciendo lo que estudiaba. Volver a inscribirse y cursar los semestres que faltan no cabe en su vida; acreditar lo que ya sabe, sí.</p>
+      <p>Es el segmento con menos miedo al examen y el que más se parece al exalumno que sí compró. La brecha entre egresados y titulados en México ya es de unas 170 mil personas al año (IMCO con datos de ANUIES), y alimenta este grupo cada año.</p>
+      <p class="slogan">Tu carrera no se quedó en pausa. Tu título sí.</p><small>Variante: «Termina lo que empezaste, con lo que ya sabes.»</small>
+    </div>
+    <div>
+      <p><strong>Hooks</strong></p>
+      <ul>
+        <li>Te quedaste en quinto semestre. Llevas diez años ejerciendo.</li>
+        <li>No tienes que volver a la universidad para terminar.</li>
+        <li>Lo que te faltó de la carrera ya lo aprendiste trabajando.</li>
+        <li>¿Licenciatura trunca? Hay una ruta oficial de la SEP.</li>
+      </ul>
+      <p class="kw"><b>Keywords:</b> terminar licenciatura trunca · titularme sin terminar la carrera · dejé la universidad cómo me titulo · licenciatura trunca opciones · terminar la carrera trabajando</p>
+      <p class="kw"><b>Pregunta para LLMs:</b> «Dejé la licenciatura a la mitad hace años, ¿cómo puedo titularme sin volver a la universidad?»</p>
+    </div>
+  </div>
+</div>
+
+<div class="angle">
+  <div class="rank">Prioridad 3 · Motivo 5</div>
+  <h3>El siguiente empleo</h3>
+  <p class="from">«Me quiero cambiar de empresa, pero sé que me van a pedir el título para contratarme.»</p>
+  <div class="data">
+    <div><b>8.29 M</b><span>asalariados sin licenciatura, 25–64</span></div>
+    <div><b>223 mil</b><span>buscan activamente cambiar de trabajo en el trimestre</span></div>
+    <div><b>1.14 M</b><span>ocupados de todo el país en la misma búsqueda</span></div>
+  </div>
+  <div class="two">
+    <div>
+      <p><strong>Insight.</strong> En su empresa actual lo conocen y nadie revisa su escolaridad. En una nueva, el filtro de la vacante lo descarta antes de la entrevista. Su experiencia no le sirve si no llega a la entrevista.</p>
+      <p>El número de quienes buscan cambiar es una foto de un trimestre: a lo largo del año la cifra rota y es mayor. No encontramos una cifra pública del porcentaje de vacantes que piden licenciatura; ManpowerGroup reporta que solo 11 % de los empleadores están relajando el requisito de título (citado por IMCO, 2025).</p>
+      <p class="slogan">Tu experiencia te lleva a la entrevista. Tu título te deja entrar.</p><small>Variante: «Que el filtro de la vacante no decida por ti.»</small>
+    </div>
+    <div>
+      <p><strong>Hooks</strong></p>
+      <ul>
+        <li>Tienes 10 años de experiencia y la vacante te descarta en el primer filtro.</li>
+        <li>«Licenciatura terminada, indispensable.» ¿Te suena?</li>
+        <li>Antes de mandar tu CV, haz esto.</li>
+        <li>Sí puedes pedir ese sueldo. Primero, el título.</li>
+      </ul>
+      <p class="kw"><b>Keywords:</b> vacantes que piden licenciatura · conseguir trabajo sin título · título universitario para trabajar · cómo obtener un título rápido · licenciatura por experiencia laboral</p>
+      <p class="kw"><b>Pregunta para LLMs:</b> «Tengo años de experiencia pero las vacantes piden licenciatura, ¿qué opciones oficiales tengo?»</p>
+    </div>
+  </div>
+  <p class="kw"><b>Canales:</b> Search, LinkedIn y alianzas o anuncios en bolsas de trabajo (OCC, Computrabajo, Indeed), donde la persona ya está leyendo el requisito.</p>
+</div>
+
+<div class="angle">
+  <div class="rank">Prioridad 4 · Motivo 9</div>
+  <h3>Mamá que trabaja</h3>
+  <p class="from">«Dejé la escuela para enfocarme en mi familia, pero titularme era un sueño y quería demostrarles a mis hijos que sí se puede.»</p>
+  <div class="data">
+    <div><b>3.60 M</b><span>madres sin licenciatura con empleo, 25–64</span></div>
+    <div><b>2.37 M</b><span>de ellas tienen entre 30 y 49 años</span></div>
+    <div><b>1.74 M</b><span>con empleo formal, ingreso medio $12,233</span></div>
+  </div>
+  <div class="two">
+    <div>
+      <p><strong>Insight.</strong> Renunció a la escuela por otros, y el título es algo para ella que también les enseña algo a sus hijos. La culpa de quitarle tiempo a la familia es el freno principal; el proceso en línea, por las noches y con exámenes en fin de semana, la resuelve.</p>
+      <p>El filtro de ingreso importa aquí: 7.98 M de mujeres están en el universo y 6.35 M son madres, pero solo 3.60 M de esas madres trabajan. La pauta debe ir a madres con empleo (por puesto e intereses laborales), no a todas las madres, y el mensaje debe mezclar orgullo con un beneficio laboral.</p>
+      <p class="slogan">Lo pausaste por ellos. Termínalo frente a ellos.</p><small>Variante: «Que tus hijos te vean titularte.»</small>
+    </div>
+    <div>
+      <p><strong>Hooks</strong></p>
+      <ul>
+        <li>Mi hija estuvo en mi examen. Esto es lo que me dijo.</li>
+        <li>Dejaste la escuela por tu familia. Tu familia quiere verte terminar.</li>
+        <li>Estudias de noche, presentas en fin de semana, sigues trabajando.</li>
+        <li>No tienes que elegir entre tu familia y tu título.</li>
+      </ul>
+      <p class="kw"><b>Keywords:</b> titularme siendo mamá · estudiar y trabajar siendo mamá · terminar mi carrera siendo mamá · título universitario en línea para mujeres que trabajan</p>
+      <p class="kw"><b>Pregunta para LLMs:</b> «Soy mamá, trabajo y dejé la carrera, ¿cómo me titulo sin ir a clases?»</p>
+    </div>
+  </div>
+</div>
+
+<div class="angle">
+  <div class="rank">Prioridad 5 · Motivos 7 y 8</div>
+  <h3>Antes de jubilarme</h3>
+  <p class="from">«Estoy por jubilarme y no quería hacerlo sin mi título.» «Quería ser ejemplo para mis nietos: nunca es tarde.»</p>
+  <div class="data">
+    <div><b>1.19 M</b><span>trabajan entre 55 y 64 años sin licenciatura</span></div>
+    <div><b>625 mil</b><span>con empleo formal, ingreso medio $14,669</span></div>
+    <div><b>2.32 M</b><span>si se amplía a 50–64 años</span></div>
+  </div>
+  <div class="two">
+    <div>
+      <p><strong>Insight.</strong> Cerrar la vida laboral con el reconocimiento oficial de lo que hizo por treinta años. Tiene ingreso estable y, en muchos casos, ahorro, finiquito o prima de antigüedad cerca. La fecha de retiro le da urgencia a algo que de otro modo sería solo un deseo.</p>
+      <p>El encaje digital es menor: necesita acompañamiento humano (WhatsApp, llamada) y una plataforma sencilla. Las dos visitas a examen no son freno; la tecnología sí puede serlo. Validar con INEVAP si en algún sector (gobierno, magisterio, empresas con escalafón) el título cambia el nivel con el que se jubila: si es así, es el argumento más fuerte, pero no lo afirmamos sin respaldo.</p>
+      <p class="slogan">Treinta años de experiencia merecen un título.</p><small>Variante para nietos: «Nunca es tarde. Que lo vean.»</small>
+    </div>
+    <div>
+      <p><strong>Hooks</strong></p>
+      <ul>
+        <li>Me jubilé con mi título a los 61.</li>
+        <li>Toda una vida de trabajo. Ahora con validez oficial.</li>
+        <li>Mis nietos me vieron titularme.</li>
+        <li>No es tarde. Es justo a tiempo.</li>
+      </ul>
+      <p class="kw"><b>Keywords:</b> titularme a los 50 · estudiar una licenciatura a los 55 · título universitario para adultos mayores · titularme antes de jubilarme</p>
+      <p class="kw"><b>Pregunta para LLMs:</b> «Tengo 58 años y nunca terminé la universidad, ¿puedo obtener mi título por mi experiencia?»</p>
+    </div>
+  </div>
+  <p class="kw"><b>Canales:</b> Facebook (más que Instagram o TikTok), video testimonial largo, y referidos: hijos que le regalan el proceso a sus papás es un ángulo secundario para la temporada de fin de año.</p>
+</div>
+
+<div class="angle">
+  <div class="rank">Nicho de alto valor · Motivo 4</div>
+  <h3>Mi propia cédula</h3>
+  <p class="from">«Toda mi vida he trabajado en derecho, pero bajo la firma de un compañero. Necesito mi cédula para no depender de nadie.»</p>
+  <div class="data">
+    <div><b>207 mil</b><span>profesionistas y técnicos sin licenciatura que trabajan por su cuenta o tienen empleados</span></div>
+    <div><b>1.06 M</b><span>profesionistas y técnicos sin licenciatura en total</span></div>
+    <div><b>$14,049</b><span>ingreso medio, el más alto de la lista</span></div>
+  </div>
+  <div class="two">
+    <div>
+      <p><strong>Insight.</strong> Ya ejerce y ya tiene clientes; le falta la firma. Depender de la cédula de otro le cuesta un porcentaje de cada asunto y lo expone. El título le devuelve el control del negocio.</p>
+      <p><strong>La ley lo respalda.</strong> La Ley Reglamentaria del Artículo 5.º Constitucional (arts. 25 y 26) exige título registrado para ejercer y ordena a los tribunales rechazar como patrono a quien no lo tenga. El Código Nacional de Procedimientos Penales (art. 115) exige que el defensor sea licenciado en derecho con cédula. El Código Penal Federal (art. 250) castiga la usurpación de profesión. Para contadores, el Código Fiscal de la Federación (art. 52) exige título de contador público registrado ante la SEP para firmar dictámenes fiscales.</p>
+      <p class="slogan">Tus casos, tus clientes, tu firma.</p><small>Variante para Contaduría: «Firma con tu propia cédula.»</small>
+    </div>
+    <div>
+      <p><strong>Hooks</strong></p>
+      <ul>
+        <li>Llevas los casos. Firma otro. ¿Hasta cuándo?</li>
+        <li>Cuánto te cuesta al año trabajar con la cédula de alguien más.</li>
+        <li>Abogado sin título: tu experiencia ya vale como licenciatura.</li>
+        <li>Tu despacho, a tu nombre.</li>
+      </ul>
+      <p class="kw"><b>Keywords:</b> cédula profesional por experiencia · título de abogado por experiencia laboral · licenciatura en derecho por acuerdo 286 · título de contador por experiencia · cómo obtener cédula profesional sin estudiar</p>
+      <p class="kw"><b>Pregunta para LLMs:</b> «Trabajo como abogado sin título, ¿cómo obtengo mi cédula profesional de forma legal?»</p>
+    </div>
+  </div>
+  <div class="note"><b>Cuidado con el tono:</b> no hay que exhibir al prospecto como alguien que hoy comete un delito. El mensaje es «regulariza y crece», no «te pueden denunciar». Y verificar con INEVAP que su título de Derecho por Acuerdo 286 permite tramitar cédula sin restricciones.</div>
+</div>
+</section>
+
+<section class="read">
+<h2>El proceso digital como argumento</h2>
+<p>Todos los ángulos elegidos comparten un rasgo: personas que trabajan jornada completa y no pueden faltar. Por eso el proceso en línea no es un detalle operativo; es parte de la promesa. Conviene decirlo igual en cada pieza: <strong>inscripción, documentos y asesorías en línea; dos visitas a una oficina de INEVAP para los exámenes, en fin de semana</strong>.</p>
+<ul>
+  <li><strong>Las dos visitas, con fecha a la vista.</strong> Publicar el calendario de exámenes por sede reduce la incertidumbre del ascenso con fecha y de la jubilación.</li>
+  <li><strong>Fuera de las cuatro sedes, la visita es el freno.</strong> Estado de México y Ciudad de México concentran 3.75 M de personas del universo (Censo 2020) sin sede cercana. Antes de pautar ahí, definir a qué sede viajan y decirlo en el anuncio.</li>
+  <li><strong>Facilidades de pago.</strong> El ingreso medio del universo ronda $11,000 a $14,000 al mes. Mensualidades o meses sin intereses abren los segmentos de mamás y de la carrera en pausa.</li>
+  <li><strong>Los motivos de pérdida del CRM.</strong> Hoy el portal registra por qué no compran (precio, documentos, solo exploraba, etc.), pero no por qué sí compran. Agregar el campo «motivo de compra» con estos ocho ángulos en la etapa de perfilamiento permite medir cuál convierte mejor y reasignar presupuesto con datos propios.</li>
+</ul>
+
+<h2>Orden recomendado de lanzamiento</h2>
+<ol>
+  <li><strong>El ascenso</strong> y <strong>la maestría</strong> en paralelo: los dos tienen fecha y un requisito formal. Mayor intención, menor costo por lead calificado.</li>
+  <li><strong>La carrera en pausa</strong> como campaña permanente en Search y remarketing.</li>
+  <li><strong>El siguiente empleo</strong> con presencia en bolsas de trabajo y LinkedIn.</li>
+  <li><strong>Mamá que trabaja</strong> y <strong>Antes de jubilarme</strong> como campañas de contenido y testimonio, con picos en fechas (10 de mayo, fin de año).</li>
+  <li><strong>Mi propia cédula</strong> en Search con presupuesto acotado y landing por carrera (Derecho, Contaduría).</li>
+</ol>
+</section>
+
+<section class="read">
+<h2>Fuentes</h2>
+<ol class="src">
+  <li>INEGI, Encuesta Nacional de Ocupación y Empleo, segundo trimestre 2026, microdatos. <a href="https://www.inegi.org.mx/contenidos/programas/enoe/15ymas/microdatos/enoe_2026_trim2_csv.zip">enoe_2026_trim2_csv.zip</a>. Cruces por escolaridad, posición, ocupación, edad, sexo e hijos calculados por Sentido. El grupo de ocupación y la búsqueda de empleo se asignaron por el orden de sus categorías y deben revisarse contra el diccionario de datos.</li>
+  <li>INEGI, ENOE, boletín 503/26. <a href="https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2026/enoe/enoe2026_08.pdf">enoe2026_08.pdf</a></li>
+  <li>INEGI, Censo de Población y Vivienda 2020, tabulado de Educación 12. <a href="https://www.inegi.org.mx/contenidos/programas/ccpv/2020/tabulados/cpv2020_b_eum_07_educacion.xlsx">cpv2020_b_eum_07_educacion.xlsx</a></li>
+  <li>IMCO, Compara Carreras 2025 (brecha egresados-titulados con datos de ANUIES; ManpowerGroup, Escasez de Talento 2025). <a href="https://imco.org.mx/wp-content/uploads/2025/11/Compara-Carreras_2025.pdf">Compara-Carreras_2025.pdf</a></li>
+  <li>Ley Reglamentaria del Artículo 5.º Constitucional, arts. 2, 25 y 26. <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/208_190118.pdf">diputados.gob.mx</a></li>
+  <li>Código Penal Federal, art. 250; Código Nacional de Procedimientos Penales, arts. 115 y 116; Código Fiscal de la Federación, art. 52. <a href="https://www.diputados.gob.mx/LeyesBiblio/index.htm">diputados.gob.mx/LeyesBiblio</a></li>
+</ol>
+</section>
+
+</div>
