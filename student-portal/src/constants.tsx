@@ -74,3 +74,24 @@ export const LICENCIATURAS = [
   'Ingeniería Industrial',
   'Ingeniería Computacional'
 ];
+
+/**
+ * Motivos de compra: por qué el prospecto quiere titularse ahora.
+ * Corresponden a los ángulos de campaña de la investigación de detonantes de compra.
+ * Los `id` son estables: se guardan en Firestore y se usan para medir conversión.
+ * Mantener sincronizado con `api/_lib/purchaseReasons.ts`.
+ */
+export const PURCHASE_REASONS: { id: string; label: string; pregunta: string }[] = [
+  { id: 'ascenso', label: 'Ascenso o cambio de puesto', pregunta: 'Un ascenso o cambio de puesto en mi empresa' },
+  { id: 'cambio_empresa', label: 'Cambio de empresa', pregunta: 'Cambiarme de empresa (me pedirán el título)' },
+  { id: 'maestria', label: 'Entrar a una maestría', pregunta: 'Entrar a una maestría' },
+  { id: 'carrera_pausa', label: 'Licenciatura en pausa', pregunta: 'Terminar la licenciatura que dejé en pausa' },
+  { id: 'cedula', label: 'Cédula propia', pregunta: 'Ejercer con mi propia cédula profesional' },
+  { id: 'familia', label: 'Ejemplo para la familia', pregunta: 'Ser ejemplo para mis hijos o nietos' },
+  { id: 'jubilacion', label: 'Antes de jubilarse', pregunta: 'Titularme antes de jubilarme' },
+  { id: 'meta_personal', label: 'Meta personal', pregunta: 'Una meta personal' },
+  { id: 'otro', label: 'Otro', pregunta: 'Otro motivo' },
+];
+
+export const purchaseReasonLabel = (id?: string | null) =>
+  PURCHASE_REASONS.find((r) => r.id === id)?.label || '';

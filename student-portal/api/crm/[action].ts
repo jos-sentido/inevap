@@ -3,6 +3,7 @@ import { verifyAuth } from '../_lib/auth.js';
 import { requireStaff, requireAdmin } from '../_lib/requireAdmin.js';
 import { adminAuth, adminDb } from '../_lib/firebaseAdmin.js';
 import { logActivity, assignRoundRobin } from '../_lib/crm.js';
+import { isPurchaseReason } from '../_lib/purchaseReasons.js';
 import { ghlConfigured, upsertContact, moveToStage, moveToStageNamed } from '../_lib/ghl.js';
 
 const iso = (v: any) => (v?.toDate ? v.toDate().toISOString() : v || null);
@@ -58,7 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           uid: d.id, name: u.name || '', email: u.email || '', phone: u.phone || '', city: u.city || '',
           licenciatura: u.licenciatura || '', currentStage: u.currentStage ?? 0,
           lead: u.lead || { status: 'active' }, assignedTo: u.assignedTo || null, assignedToName: u.assignedToName || null,
-          attribution: u.attribution || null,
+          attribution: u.attribution || null, purchaseReason: u.purchaseReason?.id || null,
         };
       });
       return res.status(200).json({ prospects });
@@ -83,6 +84,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           lead: u.lead || { status: 'active' }, assignedTo: u.assignedTo || null, assignedToName: u.assignedToName || null,
           preQual: u.preQual || null, attribution: u.attribution || null, professionalProfile: u.professionalProfile || null,
           payment: u.payment || { totalAbonado: 0 },
+          purchaseReason: u.purchaseReason ? { ...u.purchaseReason, at: iso(u.purchaseReason.at) } : null,
         },
         comments: cSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any), at: iso((d.data() as any).at) })),
         activity: aSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any), at: iso((d.data() as any).at) })),
@@ -113,12 +115,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // ====== Ganado / Perdido / Reactivar (staff) ======
     if (action === 'set-lead') {
       const staff = await requireStaff(req, res); if (!staff) return;
-      const { uid, status, lostReasons, note } = (req.body || {}) as { uid?: string; status?: string; lostReasons?: string[]; note?: string };
+      const { uid, status, lostReasons, note, purchaseReason } = (req.body || {}) as { uid?: string; status?: string; lostReasons?: string[]; note?: string; purchaseReason?: string };
       if (!uid || !status) return res.status(400).json({ error: 'Faltan datos' });
       const lead: Record<string, unknown> = { status };
       if (status === 'lost') { lead.lostReasons = lostReasons || []; lead.lostAt = new Date(); lead.lostBy = staff.uid; if (note) lead.note = note; }
       if (status === 'won') { lead.wonAt = new Date(); lead.wonBy = staff.uid; }
-      await db.doc(`users/${uid}`).set({ lead, updatedAt: new Date() }, { merge: true });
+      const upd: Record<string, unknown> = { lead, updatedAt: new Date() };
+      // Al ganar, el vendedor confirma el motivo de compra.
+      if (status === 'won' && isPurchaseReason(purchaseReason)) upd.purchaseReason = { id: purchaseReason, source: 'staff', by: staff.uid, at: new Date() };
+      await db.doc(`users/${uid}`).set(upd, { merge: true });
       await logActivity(uid, `lead_${status}`, status === 'lost' ? `Marcado perdido: ${(lostReasons || []).join(', ')}` : status === 'won' ? 'Marcado como ganado' : 'Reactivado', staff.uid);
 
       if (ghlConfigured() && (status === 'lost' || status === 'won')) {
@@ -133,6 +138,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         } catch (e) { console.error('GHL set-lead', e); }
       }
+      return res.status(200).json({ ok: true });
+    }
+
+    // ====== Motivo de compra (staff) ======
+    if (action === 'set-purchase-reason') {
+      const staff = await requireStaff(req, res); if (!staff) return;
+      const { uid, reason } = (req.body || {}) as { uid?: string; reason?: string };
+      if (!uid || !isPurchaseReason(reason)) return res.status(400).json({ error: 'Motivo inválido' });
+      await db.doc(`users/${uid}`).set({ purchaseReason: { id: reason, source: 'staff', by: staff.uid, at: new Date() }, updatedAt: new Date() }, { merge: true });
+      await logActivity(uid, 'purchase_reason', `Motivo de compra: ${reason}`, staff.uid);
       return res.status(200).json({ ok: true });
     }
 

@@ -3,6 +3,7 @@ import { verifyAuth } from '../_lib/auth.js';
 import { adminDb } from '../_lib/firebaseAdmin.js';
 import { ghlConfigured, upsertContact, moveToStage } from '../_lib/ghl.js';
 import { logActivity } from '../_lib/crm.js';
+import { isPurchaseReason } from '../_lib/purchaseReasons.js';
 
 // Etapa 0: guarda el perfilamiento (precalificación) y avanza a Admisión.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -10,12 +11,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const user = await verifyAuth(req);
   if (!user) return res.status(401).json({ error: 'No autorizado' });
 
-  const { professionalProfile, preQual, licenciatura, phone, city } = (req.body || {}) as {
+  const { professionalProfile, preQual, licenciatura, phone, city, purchaseReason } = (req.body || {}) as {
     professionalProfile?: { yearsExp?: string; currentRole?: string; industry?: string };
     preQual?: Record<string, string>;
     licenciatura?: string;
     phone?: string;
     city?: string;
+    purchaseReason?: string;
   };
 
   try {
@@ -36,8 +38,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (licenciatura) updates.licenciatura = licenciatura;
     if (phone) updates.phone = phone;
     if (city) updates.city = city;
+    // Motivo de compra declarado por el alumno; no pisa uno que ya haya fijado el staff.
+    const motivo = isPurchaseReason(purchaseReason) && data.purchaseReason?.source !== 'staff' ? purchaseReason : null;
+    if (motivo) updates.purchaseReason = { id: motivo, source: 'alumno', at: new Date() };
     await userRef.set(updates, { merge: true });
     await logActivity(user.uid, 'prequalified', 'Completó el perfilamiento y avanzó a Admisión');
+    if (motivo) await logActivity(user.uid, 'purchase_reason', `Motivo de compra (alumno): ${motivo}`);
 
     // Best-effort: actualiza el contacto en GHL con el perfil nuevo
     if (ghlConfigured()) {

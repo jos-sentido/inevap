@@ -4,7 +4,7 @@ import { Sparkles, Loader2, PlayCircle, ArrowRight, MessageCircle, CheckCircle2 
 import { db } from '../../lib/firebase';
 import { authedPostJSON } from '../../lib/api';
 import { useAuth } from '../../contexts/AuthContext';
-import { LICENCIATURAS } from '../../constants';
+import { LICENCIATURAS, PURCHASE_REASONS } from '../../constants';
 
 const WHATSAPP = '523339498607'; // 33 3949 8607
 
@@ -35,6 +35,7 @@ const Bienvenida: React.FC<{ onContinuar: () => void }> = ({ onContinuar }) => {
     industry: prof.professionalProfile?.industry || '',
     titularseCuando: '',
     comoConociste: '',
+    purchaseReason: '',
   });
 
   useEffect(() => {
@@ -52,6 +53,7 @@ const Bienvenida: React.FC<{ onContinuar: () => void }> = ({ onContinuar }) => {
         licenciatura: form.licenciatura,
         phone: form.phone,
         city: form.city,
+        purchaseReason: form.purchaseReason || undefined,
         professionalProfile: { yearsExp: form.yearsExp, currentRole: form.currentRole, industry: form.industry },
         preQual: {
           bachillerato: form.bachillerato,
@@ -138,6 +140,17 @@ const Bienvenida: React.FC<{ onContinuar: () => void }> = ({ onContinuar }) => {
             <select value={form.licenciatura} onChange={(e) => set('licenciatura', e.target.value)} className={input}>
               {LICENCIATURAS.map((l) => <option key={l}>{l}</option>)}
             </select>
+          </div>
+          <div>
+            <label className={label}>¿Qué te motiva a titularte ahora?</label>
+            <div className="flex flex-wrap gap-2">
+              {PURCHASE_REASONS.map((r) => (
+                <button key={r.id} type="button" onClick={() => set('purchaseReason', r.id)}
+                  className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${form.purchaseReason === r.id ? 'bg-[#2B5299] text-white border-[#2B5299]' : 'bg-white text-slate-600 border-slate-200 hover:border-[#2B5299]'}`}>
+                  {r.pregunta}
+                </button>
+              ))}
+            </div>
           </div>
           <div>
             <label className={label}>¿Concluiste tu bachillerato?</label>

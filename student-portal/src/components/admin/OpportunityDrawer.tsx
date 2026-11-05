@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, Loader2, MessageCircle, Phone, Mail, Send, UserX, Trophy, MapPin, Clock, RotateCcw } from 'lucide-react';
 import { authedGetJSON, authedPostJSON } from '../../lib/api';
-import { STAGES_CONFIG } from '../../constants';
+import { STAGES_CONFIG, PURCHASE_REASONS } from '../../constants';
 
 interface Staff { uid: string; name: string }
 interface Detail {
@@ -19,6 +19,8 @@ const OpportunityDrawer: React.FC<{ uid: string; staff: Staff[]; reasons: string
   const [busy, setBusy] = useState(false);
   const [showLost, setShowLost] = useState(false);
   const [lostReasons, setLostReasons] = useState<string[]>([]);
+  const [showWon, setShowWon] = useState(false);
+  const [wonReason, setWonReason] = useState('');
 
   const load = async () => setD(await authedGetJSON<Detail>(`/api/crm/opportunity?uid=${uid}`));
   useEffect(() => { load(); }, [uid]);
@@ -37,6 +39,7 @@ const OpportunityDrawer: React.FC<{ uid: string; staff: Staff[]; reasons: string
 
   const p = d.prospect;
   const status = p.lead?.status || 'active';
+  const motivo: string = p.purchaseReason?.id || '';
   const input = 'w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-100';
 
   return (
@@ -79,15 +82,35 @@ const OpportunityDrawer: React.FC<{ uid: string; staff: Staff[]; reasons: string
           </div>
         </div>
 
+        {/* Motivo de compra */}
+        <div className="mb-5">
+          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1 block">
+            Motivo de compra{p.purchaseReason?.source === 'alumno' ? ' · lo eligió el prospecto' : ''}
+          </label>
+          <select value={motivo} onChange={(e) => e.target.value && act('/api/crm/set-purchase-reason', { uid, reason: e.target.value })} className={input}>
+            <option value="">Sin registrar</option>
+            {PURCHASE_REASONS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+          </select>
+        </div>
+
         {/* Ganado / Perdido */}
         {status !== 'won' && status !== 'lost' && (
           <div className="flex gap-2 mb-5">
-            <button onClick={() => act('/api/crm/set-lead', { uid, status: 'won' })} disabled={busy} className="flex-1 bg-emerald-600 text-white font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-emerald-700 disabled:opacity-50"><Trophy size={16} /> Ganado</button>
-            <button onClick={() => setShowLost(!showLost)} className="flex-1 bg-red-50 text-red-600 font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-red-100"><UserX size={16} /> Perdido</button>
+            <button onClick={() => { setWonReason(motivo); setShowWon(!showWon); setShowLost(false); }} disabled={busy} className="flex-1 bg-emerald-600 text-white font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-emerald-700 disabled:opacity-50"><Trophy size={16} /> Ganado</button>
+            <button onClick={() => { setShowLost(!showLost); setShowWon(false); }} className="flex-1 bg-red-50 text-red-600 font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-red-100"><UserX size={16} /> Perdido</button>
           </div>
         )}
         {(status === 'won' || status === 'lost') && (
           <button onClick={() => act('/api/crm/set-lead', { uid, status: 'active' })} disabled={busy} className="w-full bg-slate-100 text-slate-600 font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-slate-200 mb-5"><RotateCcw size={15} /> Reactivar oportunidad</button>
+        )}
+        {showWon && status !== 'won' && (
+          <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 mb-5">
+            <p className="text-xs font-bold text-slate-600 mb-2">¿Por qué compró? Confirma el motivo:</p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {PURCHASE_REASONS.map((r) => <button key={r.id} onClick={() => setWonReason(r.id)} className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${wonReason === r.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 border-slate-200'}`}>{r.label}</button>)}
+            </div>
+            <button onClick={() => { act('/api/crm/set-lead', { uid, status: 'won', purchaseReason: wonReason }); setShowWon(false); }} disabled={!wonReason || busy} className="w-full bg-emerald-600 text-white font-bold text-sm rounded-xl py-2.5 disabled:opacity-40">Confirmar ganado</button>
+          </div>
         )}
         {showLost && status !== 'lost' && (
           <div className="bg-red-50/50 border border-red-100 rounded-2xl p-4 mb-5">
