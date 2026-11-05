@@ -1,0 +1,308 @@
+<title>Tu maestría empieza en INEVAP</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: informe de una columna de lectura, con tablas y cifras que se salen a ancho completo; identidad INEVAP (azul institucional + cian) */
+:root{
+  --bg:#F5F7FB; --surface:#FFFFFF; --ink:#13203A; --ink-2:#44526E; --rule:#D5DCE8;
+  --navy:#2B5299; --cyan:#00ADEF; --cyan-soft:#DDF3FC; --warn:#8A5A00; --warn-bg:#FFF4DC;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1524; --surface:#142036; --ink:#E7EDF8; --ink-2:#A9B6CD; --rule:#2A3954;
+  --navy:#8FB0EE; --cyan:#3CC6F7; --cyan-soft:#12324A; --warn:#F2C46B; --warn-bg:#33270F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1524; --surface:#142036; --ink:#E7EDF8; --ink-2:#A9B6CD; --rule:#2A3954;
+  --navy:#8FB0EE; --cyan:#3CC6F7; --cyan-soft:#12324A; --warn:#F2C46B; --warn-bg:#33270F; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.read{max-width:68ch}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.1rem,5.5vw,3.6rem);font-weight:800;letter-spacing:-.02em}
+h1 span{color:var(--navy)}
+h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;margin-top:64px;padding-top:24px;border-top:3px solid var(--navy)}
+h3{font-size:1.15rem;font-weight:600;margin-top:28px}
+p{margin:12px 0}
+.kicker{font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy)}
+.lede{font-size:1.2rem;color:var(--ink-2);max-width:62ch}
+.meta{font-size:.85rem;color:var(--ink-2);margin-top:18px}
+strong{font-weight:700}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;margin:36px 0 8px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.fig{padding:20px 20px 20px 0;border-right:1px solid var(--rule);min-width:0}
+.fig:last-child{border-right:0}
+.fig+.fig{padding-left:20px}
+.fig b{display:block;font-family:var(--display);font-size:2.3rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.1}
+.fig span{font-size:.92rem;color:var(--ink-2)}
+@media (max-width:620px){.fig{border-right:0;border-bottom:1px solid var(--rule);padding-left:0!important}.fig:last-child{border-bottom:0}}
+.tbl{overflow-x:auto;margin:18px 0;background:var(--surface);border:1px solid var(--rule)}
+table{border-collapse:collapse;width:100%;font-size:.95rem;min-width:560px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);font-weight:700}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tr.sum td{font-weight:700;background:var(--cyan-soft)}
+.funnel{display:grid;gap:10px;margin:22px 0}
+.step{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;align-items:end}
+.step .bar{grid-column:1/-1;height:14px;background:var(--cyan);border-radius:2px}
+.step .lab{font-weight:600;min-width:0}
+.step .lab small{display:block;font-weight:400;color:var(--ink-2);font-size:.88rem}
+.step .val{font-family:var(--display);font-weight:800;font-size:1.25rem;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ages{display:grid;gap:6px;margin:16px 0}
+.age{display:grid;grid-template-columns:5.5rem minmax(0,1fr) 5.5rem;gap:10px;align-items:center;font-size:.92rem;font-variant-numeric:tabular-nums}
+.age i{display:block;height:12px;background:var(--navy);border-radius:2px}
+.age em{font-style:normal;text-align:right;color:var(--ink-2)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:0 32px}
+.cols>div{min-width:0}
+.seg{border-top:1px solid var(--rule);padding-top:14px;margin-top:18px}
+.seg h3{margin-top:0}
+.seg p{font-size:.98rem}
+.tag{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:2px;background:var(--cyan-soft);color:var(--ink);margin-right:6px}
+ol.hooks{padding-left:1.4em;columns:2 320px;column-gap:40px}
+ol.hooks li{break-inside:avoid;margin-bottom:10px}
+.angle{display:grid;grid-template-columns:minmax(0,13rem) minmax(0,1fr);gap:8px 28px;padding:18px 0;border-bottom:1px solid var(--rule)}
+.angle:first-of-type{border-top:1px solid var(--rule)}
+.angle h3{margin:0}
+.angle p{margin:0 0 6px}
+.angle .line{font-family:var(--display);font-weight:600;color:var(--navy);font-size:1.05rem}
+@media (max-width:620px){.angle{grid-template-columns:1fr}}
+.note{background:var(--warn-bg);color:var(--ink);border-left:4px solid var(--warn);padding:14px 18px;margin:20px 0;font-size:.96rem}
+.note b{color:var(--warn)}
+.slog{display:grid;gap:0;margin:16px 0;border-top:1px solid var(--rule)}
+.slog div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:6px 24px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.slog q{font-family:var(--display);font-weight:600;font-size:1.1rem;quotes:"«" "»"}
+.slog span{color:var(--ink-2);font-size:.95rem}
+@media (max-width:620px){.slog div{grid-template-columns:1fr}}
+ul{padding-left:1.2em} li{margin-bottom:6px}
+.src{font-size:.88rem;color:var(--ink-2)}
+.src li{margin-bottom:8px;word-break:break-word}
+a{color:var(--navy);text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+code{font-size:.9em;background:var(--cyan-soft);padding:1px 5px;border-radius:2px}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="kicker">INEVAP · Investigación de audiencia · Noviembre 2026</div>
+  <h1>Tu maestría <span>empieza en INEVAP</span></h1>
+  <p class="lede">Quién es la persona que ya sabe lo que enseña una maestría pero no puede inscribirse porque le falta la licenciatura, cuántas hay en México según datos oficiales, y cómo hablarle en anuncios, buscadores y asistentes de IA.</p>
+  <p class="meta">Preparado por Sentido para INEVAP. Cifras de INEGI, SEP, IMCO, DOF y CENEVAL; las estimaciones propias están marcadas como tales.</p>
+</header>
+
+<div class="figs">
+  <div class="fig"><b>13.8 M</b><span>personas de 25 a 64 años con bachillerato terminado, estudios técnicos después de la prepa o licenciatura trunca (INEGI, Censo 2020)</span></div>
+  <div class="fig"><b>1.9–2.9 M</b><span>de ellas trabajan en puestos afines a las 9 carreras de INEVAP (estimación Sentido)</span></div>
+  <div class="fig"><b>190–460 mil</b><span>tendrían intención de cursar maestría, con la misma propensión que ya muestran los licenciados (estimación)</span></div>
+  <div class="fig"><b>~13 mil</b><span>títulos de licenciatura acumulados vía CENEVAL por Acuerdo 286. El mercado está casi sin atender</span></div>
+</div>
+
+<section class="read">
+<h2>El hallazgo</h2>
+<p>Varios exalumnos de INEVAP no buscaban el título por el título. Lo buscaban porque una maestría se los pedía. Tenían años de experiencia en administración, contabilidad, ventas o docencia, y la maestría les cerraba la puerta por un requisito formal.</p>
+<p>Ese requisito existe por norma. El <strong>Acuerdo 17/11/17 de la SEP, art. 10, fracción III</strong>, exige para cualquier maestría con RVOE «tener por lo menos como antecedente académico el título de licenciatura». La Ley General de Educación Superior (art. 11) lo confirma: la maestría se cursa después de la licenciatura. Y la escuela tiene seis meses para verificar el antecedente; si no lo valida, se anulan las calificaciones (art. 62).</p>
+<p>Así que la persona que busca «maestría sin licenciatura» no tiene una ruta legal directa. Tiene una ruta en dos pasos: <strong>acreditar la licenciatura con su experiencia (Acuerdo 286) y luego inscribirse a la maestría</strong>. INEVAP es el primer paso. Ese es el sentido literal del slogan.</p>
+</section>
+
+<section>
+<h2>El slogan</h2>
+<div class="read">
+<p>«Tu maestría empieza en INEVAP» funciona porque cambia la conversación: deja de vender un título como trámite y lo vende como el inicio de un plan más grande. Le habla a alguien que ya tiene una meta, no a alguien que necesita convencerse de estudiar.</p>
+<p>Tiene un riesgo: INEVAP no imparte maestrías. Leído solo, en un anuncio de 3 segundos, puede entenderse que sí. Eso genera leads equivocados y, en Google Ads y Meta, puede contar como promesa engañosa en la categoría de educación. Conviene acompañarlo siempre con una línea que aclare el paso.</p>
+</div>
+<div class="slog">
+  <div><q>Tu maestría empieza en INEVAP.</q><span>Titular principal. Siempre con subtítulo: «Primero, tu licenciatura con validez SEP en 2 exámenes.»</span></div>
+  <div><q>Tu maestría empieza con tu título.</q><span>Variante para Search y para anuncios donde no cabe el subtítulo. No promete nada que INEVAP no haga.</span></div>
+  <div><q>Ya sabes lo de la maestría. Te falta el papel para entrar.</q><span>Variante de hook para Reels y TikTok, segmento con experiencia larga.</span></div>
+  <div><q>De la experiencia a la licenciatura. De la licenciatura a la maestría.</q><span>Línea narrativa para la landing y los testimonios de exalumnos.</span></div>
+</div>
+</section>
+
+<section>
+<h2>Cuántas personas son</h2>
+<div class="read">
+<p>El Censo 2020 de INEGI publica la escolaridad por grados aprobados, por edad, sexo y entidad. Sumamos los tres grupos que no tienen licenciatura y pueden acreditarla por Acuerdo 286: prepa terminada como último nivel, estudios técnicos con prepa terminada, y licenciatura con 1 a 3 grados aprobados.</p>
+</div>
+<div class="tbl"><table>
+  <thead><tr><th>Último nivel aprobado (25 a 64 años)</th><th class="n">Personas</th><th>Lectura</th></tr></thead>
+  <tbody>
+    <tr><td>Preparatoria o bachillerato, 3 o más grados</td><td class="n">10,126,027</td><td>Núcleo del mercado: terminó la prepa y se fue a trabajar</td></tr>
+    <tr><td>Estudios técnicos o comerciales con prepa terminada</td><td class="n">1,114,704</td><td>Técnicos que hoy ejercen como ingenieros o contadores</td></tr>
+    <tr><td>Licenciatura, 1 a 3 grados</td><td class="n">2,585,628</td><td>La licenciatura trunca: la más cercana a la maestría</td></tr>
+    <tr class="sum"><td>Universo base</td><td class="n">13,826,359</td><td>Hombres 6.83 M · Mujeres 7.00 M</td></tr>
+    <tr><td>Referencia: licenciatura 4 o más grados</td><td class="n">9,736,641</td><td>Incluye pasantes sin título que el Censo no separa</td></tr>
+    <tr><td>Referencia: posgrado</td><td class="n">1,830,506</td><td>15.8 % de quienes llegaron a licenciatura completa</td></tr>
+  </tbody>
+</table></div>
+<p class="src">Fuente: INEGI, Censo de Población y Vivienda 2020, tabulado de Educación 12. Suma de grupos quinquenales 25–64 hecha por Sentido. La Encuesta Intercensal 2025 (130.9 M de habitantes, escolaridad promedio 10.3 años) aún no publica el desglose por nivel; cuando salga, el universo crecerá.</p>
+
+<h3>Del universo al mercado con intención de maestría</h3>
+<div class="read"><p>Los filtros siguientes son estimaciones de Sentido, no cifras oficiales. Se dan en rango para que se puedan ajustar con datos propios de INEVAP.</p></div>
+<div class="funnel">
+  <div class="step"><div class="lab">Universo base<small>Sin licenciatura, 25–64 años, bachillerato o más (Censo 2020)</small></div><div class="val">13.8 M</div><div class="bar" style="width:100%"></div></div>
+  <div class="step"><div class="lab">Trabajan<small>Supuesto: 70 % ocupados en ese rango de edad</small></div><div class="val">9.7 M</div><div class="bar" style="width:70%"></div></div>
+  <div class="step"><div class="lab">Con experiencia afín a las 9 carreras<small>Supuesto: 20–30 % en puestos administrativos, comerciales, contables, docentes, técnicos o de mando. La EIC 2025 ubica a 22.8 % de los ocupados como funcionarios, profesionistas y técnicos</small></div><div class="val">1.9–2.9 M</div><div class="bar" style="width:21%"></div></div>
+  <div class="step"><div class="lab">Con intención de maestría<small>Supuesto: 10–16 %. El techo es la proporción real de licenciados de 25–64 años que llegaron a posgrado (Censo 2020)</small></div><div class="val">190–460 mil</div><div class="bar" style="width:3.4%"></div></div>
+  <div class="step"><div class="lab">Se activan cada año<small>Supuesto: una décima parte por año, en una ventana de 10 años de vida laboral</small></div><div class="val">19–46 mil / año</div><div class="bar" style="width:.4%;min-width:4px"></div></div>
+</div>
+<div class="read">
+<p>Para comparar: CENEVAL, el evaluador más grande del Acuerdo 286, reporta poco más de <strong>13 mil títulos de licenciatura acumulados</strong> en toda su historia. La demanda potencial de un solo año, solo en el segmento con intención de maestría, es mayor que eso.</p>
+<p>En los cuatro estados con sede de INEVAP vive 16.6 % del universo base: <strong>Jalisco 916 mil, Nuevo León 567 mil, Baja California 517 mil y Quintana Roo 289 mil</strong> (2.29 M en total). Con los mismos filtros, son entre 32 y 77 mil personas con intención de maestría. Estado de México (2.28 M) y Ciudad de México (1.47 M) son los dos mercados más grandes y no tienen sede, una razón para empujar el proceso en línea en esas zonas.</p>
+</div>
+
+<h3>Por edad (universo base, 25–64 años)</h3>
+<div class="ages" role="img" aria-label="Universo base por grupo de edad">
+  <div class="age"><span>25–29</span><i style="width:100%"></i><em>3.16 M</em></div>
+  <div class="age"><span>30–34</span><i style="width:82%"></i><em>2.59 M</em></div>
+  <div class="age"><span>35–39</span><i style="width:66.9%"></i><em>2.12 M</em></div>
+  <div class="age"><span>40–44</span><i style="width:55%"></i><em>1.74 M</em></div>
+  <div class="age"><span>45–49</span><i style="width:48.3%"></i><em>1.53 M</em></div>
+  <div class="age"><span>50–54</span><i style="width:40.4%"></i><em>1.28 M</em></div>
+  <div class="age"><span>55–59</span><i style="width:27.1%"></i><em>0.86 M</em></div>
+  <div class="age"><span>60–64</span><i style="width:17.5%"></i><em>0.55 M</em></div>
+</div>
+<div class="read">
+<p>La masa está entre 25 y 39 años (57 %), pero el Acuerdo 286 pide experiencia comprobable y la maestría tiene sentido cuando ya hay carrera. El punto dulce para pauta es <strong>30 a 49 años</strong>: 7.98 M de personas del universo, con experiencia suficiente y con la presión de un ascenso que ya llegó al techo. Hombres y mujeres pesan casi igual; la eficiencia terminal en educación superior es de 60.1 % en hombres contra 72.0 % en mujeres (SEP 2023-2024), así que la licenciatura trunca tiende a ser más masculina.</p>
+</div>
+
+<h3>Lo que dicen las cifras de contexto</h3>
+<div class="tbl"><table>
+  <thead><tr><th>Dato</th><th class="n">Valor</th><th>Fuente</th></tr></thead>
+  <tbody>
+    <tr><td>Ingreso de quien tiene educación superior frente a quien se quedó en bachillerato</td><td class="n">+74 %</td><td>IMCO, Compara Carreras 2026 (ENOE 2T2025–1T2026)</td></tr>
+    <tr><td>Informalidad: profesionistas contra bachillerato</td><td class="n">26 % vs 49 %</td><td>IMCO, Compara Carreras 2026</td></tr>
+    <tr><td>Matrícula de posgrado en México</td><td class="n">478,382</td><td>SEP, Principales Cifras 2024-2025</td></tr>
+    <tr><td>Parte de esa matrícula en modalidad no escolarizada (en línea)</td><td class="n">49.5 %</td><td>SEP, Principales Cifras 2024-2025</td></tr>
+    <tr><td>Brecha anual entre egresados y titulados de licenciatura</td><td class="n">~170 mil / año</td><td>IMCO 2025 con datos de ANUIES</td></tr>
+    <tr><td>Eficiencia terminal en educación superior</td><td class="n">66.2 %</td><td>SEP, 2023-2024</td></tr>
+    <tr><td>Población ocupada en México</td><td class="n">60.0 M</td><td>INEGI, ENOE 2T2026</td></tr>
+  </tbody>
+</table></div>
+<div class="read"><p>La mitad del posgrado en México ya se estudia en línea. La maestría que esta audiencia quiere es compatible con trabajar, y por eso el título es el único obstáculo real.</p></div>
+</section>
+
+<section>
+<h2>Quién es esta persona</h2>
+<div class="read"><p>Cinco segmentos, ordenados por cercanía a la decisión. Todos comparten lo mismo: saben del tema más que muchos egresados, y les da pena o coraje que un papel los frene.</p></div>
+<div class="cols">
+  <div class="seg"><h3>El mando medio sin título</h3><p><span class="tag">35–49</span><span class="tag">Administración · Comercio · Mercadotecnia</span></p><p>Gerente de sucursal, jefe de ventas, coordinador de operaciones. Lo ascendieron por resultados. Para la siguiente posición su empresa pide maestría o MBA, o RH lo filtra en la vacante. Quiere el MBA; descubre que no puede inscribirse.</p></div>
+  <div class="seg"><h3>La licenciatura trunca</h3><p><span class="tag">28–40</span><span class="tag">Cualquier carrera</span></p><p>Dejó la universidad en 2.º o 3.º año por trabajo, hijos o dinero. Lleva una década ejerciendo. Volver 3 años a clases no es opción; una maestría de 2 años sí, si alguien le resuelve lo de atrás.</p></div>
+  <div class="seg"><h3>El técnico que ya hace de ingeniero</h3><p><span class="tag">30–50</span><span class="tag">Ing. Industrial · Computacional</span></p><p>Supervisor de planta, líder de sistemas. En maquiladoras de Tijuana o Monterrey la maestría en manufactura, calidad o TI es un requisito de línea de carrera.</p></div>
+  <div class="seg"><h3>Quien enseña sin título</h3><p><span class="tag">30–55</span><span class="tag">Pedagogía · Preescolar</span></p><p>Asistentes educativas, instructores, capacitadores. La maestría en educación es su escalón profesional. Segmento a validar con INEVAP: las reglas de plazas públicas cambian y no conviene prometer promociones.</p></div>
+  <div class="seg"><h3>El emprendedor y el contador de despacho</h3><p><span class="tag">35–55</span><span class="tag">Contaduría · Derecho</span></p><p>Lleva años con despacho o negocio propio. Quiere maestría en impuestos, finanzas o derecho corporativo para competir con firmas grandes y firmar con cédula.</p></div>
+</div>
+<h3>Motivadores y frenos</h3>
+<div class="cols">
+  <div><p><strong>Lo que lo mueve</strong></p><ul><li>Un ascenso o una vacante concreta que pide maestría</li><li>Que su experiencia por fin valga oficialmente</li><li>Ganar lo que gana un profesionista (+74 %)</li><li>Recuperar el orgullo de lo que dejó trunco</li></ul></div>
+  <div><p><strong>Lo que lo frena</strong></p><ul><li>«¿Es legal? ¿Me van a aceptar en la maestría con ese título?»</li><li>Miedo al examen después de años sin estudiar</li><li>Ofertas de «maestría sin licenciatura» que no son confiables</li><li>Pena: no quiere que su jefe sepa que no tiene título</li></ul></div>
+</div>
+</section>
+
+<section>
+<h2>Ángulos de comunicación</h2>
+<div class="angle"><h3>La puerta cerrada</h3><div><p class="line">No te rechazaron por falta de capacidad. Te rechazaron por un requisito.</p><p>Nombra el momento exacto del dolor: el formulario de inscripción que pide cédula. Es el ángulo de mayor intención y el que mejor conecta con el insight de exalumnos.</p></div></div>
+<div class="angle"><h3>Tu experiencia ya es la carrera</h3><div><p class="line">Diez años haciendo el trabajo ya son una licenciatura. Solo falta acreditarla.</p><p>Dignifica lo que la persona ya sabe. Evita el tono de «no tienes título»; habla de lo que sí tiene.</p></div></div>
+<div class="angle"><h3>La única ruta legal</h3><div><p class="line">No existe la maestría sin licenciatura. Existe el camino corto a la licenciatura.</p><p>Diferencia a INEVAP frente a ofertas dudosas. Se apoya en la norma: Acuerdo 17/11/17 para la maestría y Acuerdo 286 para el título. Es el ángulo que mejor funciona en buscadores y en asistentes de IA.</p></div></div>
+<div class="angle"><h3>Seis meses contra cuatro años</h3><div><p class="line">Dos exámenes hoy. Tu maestría el próximo ciclo.</p><p>Hace concreto el tiempo: el proceso de INEVAP promedia 6 meses; una licenciatura escolarizada dura 4 a 5 años. Se puede calendarizar contra las convocatorias de las maestrías.</p></div></div>
+<div class="angle"><h3>Ellos ya están en la maestría</h3><div><p class="line">[Nombre del exalumno]: título en INEVAP, hoy en la maestría.</p><p>Prueba social con exalumnos reales (con permiso firmado). Es el ángulo que da origen a la campaña y el más creíble. Pide nombre, carrera, maestría a la que entró y cuánto tardó.</p></div></div>
+<div class="angle"><h3>El techo de cristal</h3><div><p class="line">El siguiente puesto pide maestría. Tú ya tienes la experiencia.</p><p>Para LinkedIn y para el mando medio. Habla de carrera, no de estudios.</p></div></div>
+</section>
+
+<section>
+<h2>Hooks</h2>
+<div class="read"><p>Para los primeros 2 segundos de Reels, TikTok y anuncios de Meta. Probar en grupos de 3 a 5 por ángulo.</p></div>
+<ol class="hooks">
+  <li>¿Te pidieron cédula para entrar a la maestría y no la tienes?</li>
+  <li>Sabes más de administración que muchos titulados. El problema es el papel.</li>
+  <li>Esto es lo que hice cuando la maestría me rechazó por no tener licenciatura.</li>
+  <li>No existe la maestría sin licenciatura. Esto sí existe.</li>
+  <li>Dejé la carrera en tercer semestre. Hoy estoy en la maestría.</li>
+  <li>Si llevas 5 años o más en tu puesto, esto te interesa.</li>
+  <li>Tu jefe no tiene que saber que no te titulaste.</li>
+  <li>Dos exámenes entre tú y tu maestría.</li>
+  <li>El MBA que quieres pide licenciatura. Así la obtienes en 6 meses.</li>
+  <li>Te ascendieron por resultados. Para el siguiente puesto piden maestría.</li>
+  <li>Lo que la SEP llama Acuerdo 286, explicado en 30 segundos.</li>
+  <li>¿Tu experiencia vale como licenciatura? La SEP dice que sí.</li>
+  <li>Contador sin título: esta es tu ruta a la maestría en impuestos.</li>
+  <li>La maestría en línea ya es la mitad del posgrado en México. Lo único que te frena es el título.</li>
+  <li>Tu maestría empieza el día que presentas tu primer examen.</li>
+</ol>
+</section>
+
+<section>
+<h2>Keywords para Search</h2>
+<div class="read"><p>Agrupadas por intención. No tenemos acceso a Keyword Planner desde aquí, así que no publicamos volúmenes: la prioridad es por intención. El siguiente paso es correr estas listas en Keyword Planner y en Search Console de inevap.com para asignar volumen y CPC reales.</p></div>
+<div class="tbl"><table>
+  <thead><tr><th>Grupo</th><th>Keywords</th><th>Prioridad</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Problema</strong>: quiere maestría, no tiene título</td><td>maestría sin licenciatura · puedo estudiar una maestría sin título · maestría sin cédula profesional · maestría sin estar titulado · maestría con experiencia laboral · requisitos para estudiar una maestría · MBA sin licenciatura · maestría sin licenciatura terminada</td><td>Alta. Es la intención exacta del insight. Hoy la SERP la ocupan blogs de universidades en línea.</td></tr>
+    <tr><td><strong>Solución</strong>: título por experiencia</td><td>acuerdo 286 · título por experiencia laboral · licenciatura por experiencia laboral · titulación acuerdo 286 · título universitario en 2 exámenes · validar experiencia como licenciatura · acreditación de conocimientos SEP</td><td>Alta. Ya es el core de INEVAP; sumar copy de maestría en los anuncios.</td></tr>
+    <tr><td><strong>Puente</strong>: dudas de validez</td><td>acuerdo 286 sirve para maestría · título acuerdo 286 tiene cédula · acuerdo 286 es válido · título por acuerdo 286 validez oficial · acuerdo 286 posgrado</td><td>Muy alta. Volumen bajo, conversión alta. Ganar con contenido orgánico y una página de respuesta.</td></tr>
+    <tr><td><strong>Por carrera</strong></td><td>título de licenciado en administración por experiencia · título de contador por experiencia laboral · licenciatura en derecho por acuerdo 286 · ingeniería industrial por experiencia · pedagogía acuerdo 286</td><td>Media. Un grupo de anuncios y una landing por carrera.</td></tr>
+    <tr><td><strong>Licenciatura trunca</strong></td><td>terminar licenciatura trunca · titularme sin terminar la carrera · deje la universidad cómo me titulo · revalidar materias licenciatura</td><td>Media. Segmento más cercano a la maestría.</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Negativas sugeridas:</strong> gratis, UNAM, IPN, beca, examen de admisión, preparatoria, secundaria, bachillerato (salvo campaña aparte), empleo, vacantes, PDF, tesis.</p>
+</section>
+
+<section class="read">
+<h2>Cómo salir en las recomendaciones de los LLMs</h2>
+<p>ChatGPT, Gemini, Perplexity, Claude y Copilot responden «¿puedo estudiar una maestría sin licenciatura?» resumiendo las fuentes que encuentran. Para que mencionen a INEVAP hace falta que haya una respuesta clara y citable que lo nombre, en sitios que esos sistemas leen.</p>
+<h3>1. Que el sitio se pueda leer</h3>
+<ul>
+  <li>La landing actual está hecha en React (Vite). Si el contenido se arma en el navegador, varios rastreadores de IA ven una página vacía. Hay que prerenderizar o generar HTML estático para las páginas clave.</li>
+  <li>En <code>robots.txt</code>, permitir explícitamente GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot y Google-Extended.</li>
+  <li>Dar de alta inevap.com en Bing Webmaster Tools: la búsqueda de ChatGPT y Copilot se apoya en el índice de Bing.</li>
+  <li>Datos estructurados schema.org: <code>EducationalOrganization</code>, <code>FAQPage</code>, <code>Course</code> por carrera, y <code>sameAs</code> a redes y perfiles.</li>
+</ul>
+<h3>2. Una página que sea la respuesta</h3>
+<ul>
+  <li>Página «¿Puedo estudiar una maestría si no tengo licenciatura?», con la respuesta en la primera línea: no directamente; primero se acredita la licenciatura por Acuerdo 286.</li>
+  <li>Citar la norma con número y artículo (Acuerdo 17/11/17, art. 10 fr. III; Ley General de Educación, arts. 141 y 145). Los modelos prefieren fuentes que citan fuentes.</li>
+  <li>Preguntas frecuentes reales: si da cédula, qué maestrías lo aceptan, cuánto tarda, cuánto cuesta, qué pasa si repruebo.</li>
+  <li>Casos de exalumnos con nombre, carrera y maestría en la que hoy están, con permiso.</li>
+</ul>
+<h3>3. Que otros hablen de INEVAP</h3>
+<ul>
+  <li>Los modelos pesan mucho las menciones de terceros: Reddit (r/mexico, r/MexicoFinanciero), Quora en español, foros de RH, YouTube con transcripción.</li>
+  <li>Notas en medios de educación y negocios sobre el Acuerdo 286 como puente al posgrado.</li>
+  <li>Aparecer en comparativos «instituciones evaluadoras Acuerdo 286» y en directorios educativos.</li>
+  <li>Perfiles de Google Business de las 4 sedes con nombre, dirección y teléfono idénticos al sitio.</li>
+</ul>
+<h3>4. Medirlo</h3>
+<p>Cada mes, correr las mismas 10 preguntas en los cinco asistentes y anotar si INEVAP aparece, en qué posición y con qué fuente. Ejemplos: «¿Puedo estudiar una maestría sin licenciatura en México?», «¿Qué es el Acuerdo 286 y sirve para posgrado?», «¿Dónde me titulo por experiencia laboral en Guadalajara?», «Mejores instituciones para titularse por Acuerdo 286».</p>
+</section>
+
+<section class="read">
+<h2>Antes de salir al aire</h2>
+<div class="note"><b>Validar con INEVAP:</b> que el título por Acuerdo 286 genera cédula profesional y es aceptado para inscripción a posgrado. Se desprende de la Ley General de Educación (art. 141: validez en toda la República; art. 145: títulos por experiencia laboral), pero no encontramos un texto oficial que lo diga de forma expresa. Toda la campaña depende de esta afirmación: conviene respaldarla con la constancia de DGAIR o Profesiones y con 3 a 5 casos documentados de exalumnos admitidos en maestría.</div>
+<ul>
+  <li><strong>El slogan no debe sugerir que INEVAP imparte maestrías.</strong> Usarlo siempre con el subtítulo del primer paso.</li>
+  <li><strong>Testimonios con consentimiento firmado</strong>, y verificar que la maestría que mencionan tenga RVOE.</li>
+  <li><strong>El 98 % de aprobación</strong> debe tener respaldo documental antes de usarse en anuncios pagados.</li>
+  <li><strong>Algunas maestrías piden licenciatura afín.</strong> Recomendar la carrera de INEVAP según la maestría meta es parte de la asesoría y un buen gancho de venta.</li>
+  <li><strong>Oportunidad a explorar:</strong> alianza con una o dos maestrías en línea (por ejemplo, con la institución que avala a INEVAP) para ofrecer la ruta completa, título más maestría, como un solo plan.</li>
+</ul>
+</section>
+
+<section class="read">
+<h2>Fuentes</h2>
+<ol class="src">
+  <li>INEGI, Censo de Población y Vivienda 2020, tabulados del cuestionario básico, Educación 12. <a href="https://www.inegi.org.mx/contenidos/programas/ccpv/2020/tabulados/cpv2020_b_eum_07_educacion.xlsx">cpv2020_b_eum_07_educacion.xlsx</a></li>
+  <li>INEGI, Encuesta Intercensal 2025, comunicado 54/26, 22 sep 2026. <a href="https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2026/ei/EIC2025-def_CP.pdf">EIC2025-def_CP.pdf</a></li>
+  <li>INEGI, ENOE, boletín 503/26, segundo trimestre 2026. <a href="https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2026/enoe/enoe2026_08.pdf">enoe2026_08.pdf</a></li>
+  <li>SEP, Principales Cifras del Sistema Educativo Nacional 2024-2025. <a href="https://www.planeacion.sep.gob.mx/Doc/estadistica_e_indicadores/principales_cifras/principales_cifras_2024_2025.pdf">principales_cifras_2024_2025.pdf</a></li>
+  <li>IMCO, Compara Carreras 2026, comunicado. <a href="https://imco.org.mx/wp-content/uploads/2026/08/Compara-Carreras-2026_Comunicado_IMCO.pdf">Compara-Carreras-2026</a></li>
+  <li>IMCO, Compara Carreras 2025, documento. <a href="https://imco.org.mx/wp-content/uploads/2025/11/Documento_Compara-Carreras-2025.pdf">Documento_Compara-Carreras-2025</a></li>
+  <li>DOF, Acuerdo 17/11/17, 13 nov 2017. <a href="https://dof.gob.mx/nota_detalle.php?codigo=5504348&amp;fecha=13/11/2017">dof.gob.mx</a></li>
+  <li>Ley General de Educación Superior, DOF 20-04-2021. <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LGES_200421.pdf">LGES</a></li>
+  <li>Ley General de Educación. <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LGE.pdf">LGE</a></li>
+  <li>Infobae, 29 sep 2025, títulos CENEVAL por Acuerdo 286 (cifra de prensa, confianza media). <a href="https://www.infobae.com/mexico/2025/09/29/reconocen-a-843-graduados-por-excelencia-en-examenes-ceneval-bajo-el-acuerdo-286/">infobae.com</a></li>
+</ol>
+</section>
+
+</div>
