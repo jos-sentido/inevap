@@ -4,6 +4,7 @@ import { adminAuth, adminDb, adminStorage } from '../_lib/firebaseAdmin.js';
 import { ghlConfigured, upsertContact, moveToStageNamed } from '../_lib/ghl.js';
 
 const DEFAULT_LOSS_REASONS = ['Precio', 'No tiene documentos', 'Solo exploraba', 'No contesta', 'Se inscribió en otro lado', 'No calificó', 'Sin interés'];
+const DEFAULT_WON_REASONS = ['Buen precio / promoción', 'Urgencia por titularse', 'Confianza en el proceso', 'Referido', 'Atención del asesor', 'Facilidad y rapidez'];
 
 const iso = (v: any) => (v?.toDate ? v.toDate().toISOString() : v || null);
 
@@ -165,6 +166,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
         const snap = await db.doc('config/lossReasons').get();
         const reasons = snap.exists ? (snap.data() as any).reasons : DEFAULT_LOSS_REASONS;
+        return res.status(200).json({ reasons });
+      }
+
+      // ---- GET/POST motivos de ganado (lista gestionable) ----
+      case 'won-reasons': {
+        if (req.method === 'POST') {
+          const { reasons } = (req.body || {}) as { reasons?: string[] };
+          if (!Array.isArray(reasons)) return res.status(400).json({ error: 'reasons inválido' });
+          await db.doc('config/wonReasons').set({ reasons, updatedAt: new Date(), updatedBy: admin.uid });
+          return res.status(200).json({ ok: true, reasons });
+        }
+        const snap = await db.doc('config/wonReasons').get();
+        const reasons = snap.exists ? (snap.data() as any).reasons : DEFAULT_WON_REASONS;
         return res.status(200).json({ reasons });
       }
 

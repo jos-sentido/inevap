@@ -26,19 +26,21 @@ const ProspectsPanel: React.FC = () => {
   const [rows, setRows] = useState<Row[]>([]);
   const [staff, setStaff] = useState<{ uid: string; name: string }[]>([]);
   const [reasons, setReasons] = useState<string[]>([]);
+  const [wonReasons, setWonReasons] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [openUid, setOpenUid] = useState<string | null>(null);
-  const [manageOpen, setManageOpen] = useState(false);
+  const [manage, setManage] = useState<'loss' | 'won' | null>(null);
 
   const load = async () => {
     setLoading(true);
     try {
-      const [p, s, r] = await Promise.all([
+      const [p, s, r, w] = await Promise.all([
         authedGetJSON<{ prospects: Row[] }>('/api/crm/prospects'),
         authedGetJSON<{ staff: { uid: string; name: string }[] }>('/api/crm/staff'),
         authedGetJSON<{ reasons: string[] }>('/api/crm/loss-reasons'),
+        authedGetJSON<{ reasons: string[] }>('/api/crm/won-reasons'),
       ]);
-      setRows(p.prospects); setStaff(s.staff); setReasons(r.reasons || []);
+      setRows(p.prospects); setStaff(s.staff); setReasons(r.reasons || []); setWonReasons(w.reasons || []);
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
   useEffect(() => { load(); }, []);
@@ -53,9 +55,14 @@ const ProspectsPanel: React.FC = () => {
           <p className="text-sm text-slate-500">{rows.length} oportunidades</p>
         </div>
         {isAdmin && (
-          <button onClick={() => setManageOpen(true)} className="bg-slate-100 text-slate-700 font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-slate-200 flex items-center gap-2">
-            <Settings2 size={16} /> Motivos de pérdida
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => setManage('won')} className="bg-emerald-50 text-emerald-700 font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-emerald-100 flex items-center gap-2">
+              <Settings2 size={16} /> Motivos de ganado
+            </button>
+            <button onClick={() => setManage('loss')} className="bg-red-50 text-red-600 font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-red-100 flex items-center gap-2">
+              <Settings2 size={16} /> Motivos de pérdida
+            </button>
+          </div>
         )}
       </div>
 
@@ -90,26 +97,34 @@ const ProspectsPanel: React.FC = () => {
         })}
       </div>
 
-      {openUid && <OpportunityDrawer uid={openUid} staff={staff} reasons={reasons} onClose={() => setOpenUid(null)} onChanged={load} />}
-      {manageOpen && <ManageReasonsModal reasons={reasons} onClose={() => setManageOpen(false)} onSaved={(r) => { setReasons(r); setManageOpen(false); }} />}
+      {openUid && <OpportunityDrawer uid={openUid} staff={staff} reasons={reasons} wonReasons={wonReasons} onClose={() => setOpenUid(null)} onChanged={load} />}
+      {manage && (
+        <ManageReasonsModal
+          title={manage === 'won' ? 'Motivos de ganado' : 'Motivos de pérdida'}
+          endpoint={manage === 'won' ? '/api/admin/won-reasons' : '/api/admin/loss-reasons'}
+          reasons={manage === 'won' ? wonReasons : reasons}
+          onClose={() => setManage(null)}
+          onSaved={(r) => { manage === 'won' ? setWonReasons(r) : setReasons(r); setManage(null); }}
+        />
+      )}
     </div>
   );
 };
 
-const ManageReasonsModal: React.FC<{ reasons: string[]; onClose: () => void; onSaved: (r: string[]) => void }> = ({ reasons, onClose, onSaved }) => {
+const ManageReasonsModal: React.FC<{ title: string; endpoint: string; reasons: string[]; onClose: () => void; onSaved: (r: string[]) => void }> = ({ title, endpoint, reasons, onClose, onSaved }) => {
   const [list, setList] = useState<string[]>(reasons);
   const [nuevo, setNuevo] = useState('');
   const [saving, setSaving] = useState(false);
   const save = async () => {
     setSaving(true);
-    try { const r = await authedPostJSON<{ reasons: string[] }>('/api/admin/loss-reasons', { reasons: list }); onSaved(r.reasons); }
+    try { const r = await authedPostJSON<{ reasons: string[] }>(endpoint, { reasons: list }); onSaved(r.reasons); }
     catch { alert('No se pudo guardar.'); } finally { setSaving(false); }
   };
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-black text-slate-800">Motivos de pérdida</h3>
+          <h3 className="text-lg font-black text-slate-800">{title}</h3>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
         </div>
         <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">

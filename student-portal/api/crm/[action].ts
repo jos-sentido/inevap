@@ -113,11 +113,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // ====== Ganado / Perdido / Reactivar (staff) ======
     if (action === 'set-lead') {
       const staff = await requireStaff(req, res); if (!staff) return;
-      const { uid, status, lostReasons, note } = (req.body || {}) as { uid?: string; status?: string; lostReasons?: string[]; note?: string };
+      const { uid, status, lostReasons, wonReasons, note } = (req.body || {}) as { uid?: string; status?: string; lostReasons?: string[]; wonReasons?: string[]; note?: string };
       if (!uid || !status) return res.status(400).json({ error: 'Faltan datos' });
       const lead: Record<string, unknown> = { status };
       if (status === 'lost') { lead.lostReasons = lostReasons || []; lead.lostAt = new Date(); lead.lostBy = staff.uid; if (note) lead.note = note; }
-      if (status === 'won') { lead.wonAt = new Date(); lead.wonBy = staff.uid; }
+      if (status === 'won') { lead.wonReasons = wonReasons || []; lead.wonAt = new Date(); lead.wonBy = staff.uid; }
       await db.doc(`users/${uid}`).set({ lead, updatedAt: new Date() }, { merge: true });
       await logActivity(uid, `lead_${status}`, status === 'lost' ? `Marcado perdido: ${(lostReasons || []).join(', ')}` : status === 'won' ? 'Marcado como ganado' : 'Reactivado', staff.uid);
 
@@ -179,11 +179,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ rules: snap.exists ? (snap.data() as any).rules || [] : [] });
     }
 
-    // ====== Motivos de pérdida (lectura staff) ======
-    if (action === 'loss-reasons') {
+    // ====== Motivos de pérdida / ganado (lectura staff) ======
+    if (action === 'loss-reasons' || action === 'won-reasons') {
       const staff = await requireStaff(req, res); if (!staff) return;
-      const snap = await db.doc('config/lossReasons').get();
-      const reasons = snap.exists ? (snap.data() as any).reasons : ['Precio', 'No tiene documentos', 'Solo exploraba', 'No contesta', 'Se inscribió en otro lado', 'No calificó', 'Sin interés'];
+      const docId = action === 'won-reasons' ? 'config/wonReasons' : 'config/lossReasons';
+      const fallback = action === 'won-reasons'
+        ? ['Buen precio / promoción', 'Urgencia por titularse', 'Confianza en el proceso', 'Referido', 'Atención del asesor', 'Facilidad y rapidez']
+        : ['Precio', 'No tiene documentos', 'Solo exploraba', 'No contesta', 'Se inscribió en otro lado', 'No calificó', 'Sin interés'];
+      const snap = await db.doc(docId).get();
+      const reasons = snap.exists ? (snap.data() as any).reasons : fallback;
       return res.status(200).json({ reasons });
     }
 

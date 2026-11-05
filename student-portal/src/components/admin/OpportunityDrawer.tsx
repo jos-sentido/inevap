@@ -13,12 +13,14 @@ interface Detail {
 const waLink = (p: string) => `https://wa.me/52${(p || '').replace(/\D/g, '')}`;
 const fmtDate = (iso: string) => iso ? new Date(iso).toLocaleString('es-MX', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
 
-const OpportunityDrawer: React.FC<{ uid: string; staff: Staff[]; reasons: string[]; onClose: () => void; onChanged: () => void }> = ({ uid, staff, reasons, onClose, onChanged }) => {
+const OpportunityDrawer: React.FC<{ uid: string; staff: Staff[]; reasons: string[]; wonReasons: string[]; onClose: () => void; onChanged: () => void }> = ({ uid, staff, reasons, wonReasons, onClose, onChanged }) => {
   const [d, setD] = useState<Detail | null>(null);
   const [comment, setComment] = useState('');
   const [busy, setBusy] = useState(false);
   const [showLost, setShowLost] = useState(false);
   const [lostReasons, setLostReasons] = useState<string[]>([]);
+  const [showWon, setShowWon] = useState(false);
+  const [wonSel, setWonSel] = useState<string[]>([]);
 
   const load = async () => setD(await authedGetJSON<Detail>(`/api/crm/opportunity?uid=${uid}`));
   useEffect(() => { load(); }, [uid]);
@@ -82,12 +84,30 @@ const OpportunityDrawer: React.FC<{ uid: string; staff: Staff[]; reasons: string
         {/* Ganado / Perdido */}
         {status !== 'won' && status !== 'lost' && (
           <div className="flex gap-2 mb-5">
-            <button onClick={() => act('/api/crm/set-lead', { uid, status: 'won' })} disabled={busy} className="flex-1 bg-emerald-600 text-white font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-emerald-700 disabled:opacity-50"><Trophy size={16} /> Ganado</button>
-            <button onClick={() => setShowLost(!showLost)} className="flex-1 bg-red-50 text-red-600 font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-red-100"><UserX size={16} /> Perdido</button>
+            <button onClick={() => { setShowWon(!showWon); setShowLost(false); }} disabled={busy} className="flex-1 bg-emerald-600 text-white font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-emerald-700 disabled:opacity-50"><Trophy size={16} /> Ganado</button>
+            <button onClick={() => { setShowLost(!showLost); setShowWon(false); }} className="flex-1 bg-red-50 text-red-600 font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-red-100"><UserX size={16} /> Perdido</button>
           </div>
         )}
         {(status === 'won' || status === 'lost') && (
-          <button onClick={() => act('/api/crm/set-lead', { uid, status: 'active' })} disabled={busy} className="w-full bg-slate-100 text-slate-600 font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-slate-200 mb-5"><RotateCcw size={15} /> Reactivar oportunidad</button>
+          <div className="mb-5">
+            {(p.lead?.wonReasons?.length || p.lead?.lostReasons?.length) ? (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {(status === 'won' ? p.lead.wonReasons : p.lead.lostReasons)?.map((r: string) => (
+                  <span key={r} className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${status === 'won' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>{r}</span>
+                ))}
+              </div>
+            ) : null}
+            <button onClick={() => act('/api/crm/set-lead', { uid, status: 'active' })} disabled={busy} className="w-full bg-slate-100 text-slate-600 font-bold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 hover:bg-slate-200"><RotateCcw size={15} /> Reactivar oportunidad</button>
+          </div>
+        )}
+        {showWon && status !== 'won' && (
+          <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 mb-5">
+            <p className="text-xs font-bold text-slate-600 mb-2">Motivos de ganado:</p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {wonReasons.map((r) => <button key={r} onClick={() => setWonSel((s) => s.includes(r) ? s.filter((x) => x !== r) : [...s, r])} className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${wonSel.includes(r) ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 border-slate-200'}`}>{r}</button>)}
+            </div>
+            <button onClick={() => { act('/api/crm/set-lead', { uid, status: 'won', wonReasons: wonSel }); setShowWon(false); }} className="w-full bg-emerald-600 text-white font-bold text-sm rounded-xl py-2.5">Confirmar ganado</button>
+          </div>
         )}
         {showLost && status !== 'lost' && (
           <div className="bg-red-50/50 border border-red-100 rounded-2xl p-4 mb-5">
