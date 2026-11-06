@@ -42,6 +42,7 @@ export interface QuentliConcept {
   chargeEach?: number;
   sku?: string;
   description?: string;
+  active?: boolean;
   plazos?: number; // derivado (meta.plazos | SKU | nombre)
 }
 
@@ -74,6 +75,7 @@ export async function listConcepts(): Promise<QuentliConcept[]> {
     chargeEach: c.recurrentDetail?.chargeEach,
     sku: c.sku,
     description: c.description,
+    active: c.active !== false,
     plazos: derivePlazos(c),
   }));
 }
@@ -90,6 +92,47 @@ export async function createSetupSession(input: {
     method: 'POST',
     body: { displayMode: 'CUSTOMER_PORTAL', ...input },
   });
+}
+
+// Crea un concepto (plan) en Quentli. amount en centavos. El plazo se codifica en el SKU
+// (termina en el número) para que derivePlazos lo detecte al listar.
+export async function createConcept(input: {
+  displayName: string;
+  amountCents: number;
+  plazos?: number;
+  description?: string;
+}): Promise<any> {
+  const slug = input.displayName.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24);
+  const sku = `${slug || 'plan'}-${Date.now().toString(36)}${input.plazos ? `-${input.plazos}` : ''}`;
+  const body: any = {
+    displayName: input.displayName,
+    amount: Math.round(input.amountCents),
+    currency: 'MXN',
+    recurrentDetail: { collectionInterval: 'MONTH', chargeEach: 1 },
+    sku,
+    ...(input.description ? { description: input.description } : {}),
+  };
+  const json = await qFetch('/v1/payment-concepts', { method: 'POST', body, idempotencyKey: sku });
+  return json.paymentConcept || json.concept || json;
+}
+
+// Edita campos de un concepto existente. PATCH /v1/payment-concepts/{id} con { input: { data } }.
+export async function updateConcept(id: string, data: Record<string, any>): Promise<any> {
+  const res = await fetch(`${BASE}/v1/payment-concepts/${id}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${process.env.QUENTLI_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ input: { data } }),
+  });
+  const text = await res.text();
+  let json: any; try { json = text ? JSON.parse(text) : {}; } catch { json = { raw: text }; }
+  if (!res.ok) {
+    const msg = json?.error?.message || json?.message || text.slice(0, 300);
+    throw new Error(`Quentli ${res.status}: ${msg}`);
+  }
+  return json.paymentConcept || json;
 }
 
 export async function createSubscription(input: any, idempotencyKey?: string): Promise<any> {

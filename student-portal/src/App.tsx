@@ -26,7 +26,8 @@ import {
   Eye,
   ArrowLeft,
   Target,
-  UserCog
+  UserCog,
+  Wallet
 } from 'lucide-react';
 import { STAGES_CONFIG, LICENCIATURAS } from './constants';
 import { Message, ProfessionalProfile } from './types';
@@ -43,6 +44,7 @@ import ExamsPanel from './components/admin/ExamsPanel';
 import GuidesPanel from './components/admin/GuidesPanel';
 import ProspectsPanel from './components/admin/ProspectsPanel';
 import TeamPanel from './components/admin/TeamPanel';
+import PlansPanel from './components/admin/PlansPanel';
 import { db, storage } from './lib/firebase';
 import { collection, getDocs, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes } from 'firebase/storage';
@@ -57,7 +59,7 @@ const Portal: React.FC = () => {
   const professional = prof.professionalProfile || emptyProfile;
 
   const [previewStudent, setPreviewStudent] = useState(false);
-  const [adminModule, setAdminModule] = useState<'prospectos' | 'alumnos' | 'examenes' | 'temarios' | 'equipo'>('prospectos');
+  const [adminModule, setAdminModule] = useState<'prospectos' | 'alumnos' | 'examenes' | 'temarios' | 'equipo' | 'planes'>('prospectos');
   const [activeStage, setActiveStage] = useState(0);
   const showAdmin = isStaff && !previewStudent;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -211,6 +213,7 @@ const Portal: React.FC = () => {
     { id: 'alumnos' as const, title: 'Alumnos', subtitle: 'Gestión', icon: <Users size={20} />, sales: false },
     { id: 'examenes' as const, title: 'Exámenes', subtitle: 'Agenda', icon: <CalendarDays size={20} />, sales: false },
     { id: 'temarios' as const, title: 'Temarios', subtitle: 'Tutor IA', icon: <Database size={20} />, sales: false },
+    { id: 'planes' as const, title: 'Planes', subtitle: 'Pagos Quentli', icon: <Wallet size={20} />, sales: false },
     { id: 'equipo' as const, title: 'Equipo', subtitle: 'Ventas', icon: <UserCog size={20} />, sales: false },
   ];
   // Vendedor (no admin): solo módulos comerciales.
@@ -339,6 +342,7 @@ const Portal: React.FC = () => {
               adminModule === 'alumnos' ? <StudentsPanel /> :
               adminModule === 'examenes' ? <ExamsPanel /> :
               adminModule === 'equipo' ? <TeamPanel /> :
+              adminModule === 'planes' ? <PlansPanel /> :
               <GuidesPanel />
             ) : activeStage === 0 ? (
               /* ETAPA 0: BIENVENIDA / PERFILAMIENTO */

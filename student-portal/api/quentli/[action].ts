@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { verifyAuth } from '../_lib/auth.js';
+import { requireAdmin } from '../_lib/requireAdmin.js';
 import { adminDb } from '../_lib/firebaseAdmin.js';
-import { quentliConfigured, listConcepts, createSetupSession } from '../_lib/quentli.js';
+import { quentliConfigured, listConcepts, createSetupSession, createConcept, updateConcept } from '../_lib/quentli.js';
 import { logActivity } from '../_lib/crm.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -17,6 +18,65 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Solo planes de pago: recurrentes con monto.
       const planes = concepts.filter((c) => c.recurrent && c.amount > 0);
       return res.status(200).json({ concepts: planes });
+    }
+
+    // ====== Admin: todos los conceptos de Quentli (gestión de planes) ======
+    if (action === 'admin-concepts') {
+      const admin = await requireAdmin(req, res); if (!admin) return;
+      if (!quentliConfigured()) return res.status(200).json({ concepts: [], configured: false });
+      const concepts = await listConcepts();
+      return res.status(200).json({ concepts, configured: true });
+    }
+
+    // ====== Admin: crea un concepto (plan) EN Quentli vía API ======
+    if (action === 'create-concept') {
+      if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+      const admin = await requireAdmin(req, res); if (!admin) return;
+      if (!quentliConfigured()) return res.status(503).json({ error: 'Quentli no configurado' });
+
+      const { name, monthlyMXN, plazos, description } = (req.body || {}) as
+        { name?: string; monthlyMXN?: number; plazos?: number; description?: string };
+      if (!name || !name.trim()) return res.status(400).json({ error: 'Falta el nombre del plan' });
+      const monthly = Number(monthlyMXN);
+      if (!Number.isFinite(monthly) || monthly <= 0) return res.status(400).json({ error: 'Monto mensual inválido' });
+      const nPlazos = Number(plazos);
+
+      const concept = await createConcept({
+        displayName: name.trim(),
+        amountCents: Math.round(monthly * 100),
+        plazos: Number.isFinite(nPlazos) && nPlazos > 0 ? nPlazos : undefined,
+        description: description?.trim() || undefined,
+      });
+      return res.status(200).json({ ok: true, concept });
+    }
+
+    // ====== Admin: edita / activa / desactiva un concepto en Quentli ======
+    if (action === 'update-concept') {
+      if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+      const admin = await requireAdmin(req, res); if (!admin) return;
+      if (!quentliConfigured()) return res.status(503).json({ error: 'Quentli no configurado' });
+
+      const { id, name, monthlyMXN, plazos, description, active } = (req.body || {}) as
+        { id?: string; name?: string; monthlyMXN?: number; plazos?: number; description?: string; active?: boolean };
+      if (!id) return res.status(400).json({ error: 'Falta id del plan' });
+
+      const data: Record<string, any> = {};
+      if (typeof name === 'string' && name.trim()) data.displayName = name.trim();
+      if (monthlyMXN != null) {
+        const m = Number(monthlyMXN);
+        if (!Number.isFinite(m) || m <= 0) return res.status(400).json({ error: 'Monto mensual inválido' });
+        data.amount = Math.round(m * 100);
+      }
+      if (description !== undefined) data.description = description?.trim() || null;
+      if (plazos !== undefined) {
+        const n = Number(plazos);
+        data.meta = { plazos: Number.isFinite(n) && n > 0 ? String(n) : '' };
+      }
+      if (typeof active === 'boolean') data.active = active;
+      if (Object.keys(data).length === 0) return res.status(400).json({ error: 'Nada que actualizar' });
+
+      const concept = await updateConcept(id, data);
+      return res.status(200).json({ ok: true, concept });
     }
 
     // ====== Inicia inscripción: crea sesión de tarjeta (hosted) y enrollment pendiente ======
