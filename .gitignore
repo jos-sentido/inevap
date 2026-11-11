@@ -17,3 +17,5 @@ build/
 .env
 .env.*
 !.env.example
+# Workspace de producción de video (vive aparte; binarios pesados, no van al repo del portal)
+videos/

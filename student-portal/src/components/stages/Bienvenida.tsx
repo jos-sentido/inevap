@@ -96,27 +96,34 @@ const Bienvenida: React.FC<{ onContinuar: () => void }> = ({ onContinuar }) => {
             Cuéntanos un poco de ti para personalizar tu proceso, y conoce cómo funciona.
           </p>
           <div className="flex flex-wrap gap-4 mt-6 text-sm font-bold">
-            <span className="bg-white/10 px-4 py-2 rounded-xl">⏱️ ~6 meses</span>
+            <span className="bg-white/10 px-4 py-2 rounded-xl">🏛️ Título expedido por la SEP</span>
             <span className="bg-white/10 px-4 py-2 rounded-xl">📝 2 exámenes</span>
-            <span className="bg-white/10 px-4 py-2 rounded-xl">✅ Validez oficial SEP</span>
+            <span className="bg-white/10 px-4 py-2 rounded-xl">✅ Validez federal</span>
           </div>
         </div>
         <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
       </div>
 
       {/* Video informativo */}
-      <div className="bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden">
-        {videoUrl ? (
-          <div className="aspect-video w-full bg-black">
-            <iframe src={videoUrl} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title="Video informativo INEVAP" />
-          </div>
-        ) : (
-          <div className="aspect-video w-full bg-slate-100 flex flex-col items-center justify-center text-slate-400">
-            <PlayCircle size={48} className="mb-3" />
-            <p className="text-sm font-bold">Video informativo (próximamente)</p>
-          </div>
-        )}
-      </div>
+      {videoUrl && /\.(mp4|webm|mov)(\?|$)|firebasestorage\.googleapis|storage\.googleapis/.test(videoUrl) ? (
+        // Reel vertical (9:16): marco angosto centrado, sin bandas negras.
+        <div className="mx-auto w-full max-w-[340px] rounded-[2rem] overflow-hidden shadow-xl border border-slate-200 bg-black">
+          <video src={videoUrl} className="w-full aspect-[9/16] object-contain" controls playsInline preload="metadata" title="Video informativo INEVAP" />
+        </div>
+      ) : (
+        <div className="bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden">
+          {videoUrl ? (
+            <div className="aspect-video w-full bg-black">
+              <iframe src={videoUrl} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title="Video informativo INEVAP" />
+            </div>
+          ) : (
+            <div className="aspect-video w-full bg-slate-100 flex flex-col items-center justify-center text-slate-400">
+              <PlayCircle size={48} className="mb-3" />
+              <p className="text-sm font-bold">Video informativo (próximamente)</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Precalificador */}
       <div className="bg-white rounded-[2rem] shadow-xl border border-slate-200 p-8">
