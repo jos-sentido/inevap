@@ -93,6 +93,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           { status: 'active', quentliSubscriptionId: sub?.id || null, quentliCustomerId: customerId, activatedAt: new Date() },
           { merge: true },
         );
+        // Total esperado del plan (para cobranza): mensualidad × plazos.
+        if (enroll.plazos && enroll.amount) {
+          const expectedTotal = (Number(enroll.amount) / 100) * Number(enroll.plazos);
+          await db.doc(`users/${uid}`).set({ payment: { expectedTotal } }, { merge: true });
+        }
         await logActivity(uid, 'enroll_active', `Plan activado (Quentli): ${enroll.conceptName || ''}`.trim());
         return res.status(200).json({ ok: true, subscriptionId: sub?.id || null });
       } catch (e: any) {

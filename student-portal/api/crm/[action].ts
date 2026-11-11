@@ -191,6 +191,65 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ reasons });
     }
 
+    // ====== Dashboard del embudo (admin) ======
+    if (action === 'dashboard') {
+      const admin = await requireAdmin(req, res); if (!admin) return;
+      const docs = (await db.collection('users').where('role', '==', 'ALUMNO').get()).docs;
+
+      const STAGES = ['Bienvenida', 'Admisión', 'Inscripción', 'Estudio', 'Prep. Oral', 'Agendado', 'Certificación'];
+      const stageCounts = new Array(7).fill(0);
+      let registros = 0, inscritos = 0, perdidos = 0, activos = 0;
+      let abonadoTotal = 0, esperadoTotal = 0, conPlan = 0;
+      const lostReasons: Record<string, number> = {};
+      const wonReasons: Record<string, number> = {};
+      const byCampaign: Record<string, { registros: number; inscritos: number; abonado: number }> = {};
+      const byRep: Record<string, { name: string; asignados: number; inscritos: number }> = {};
+
+      for (const d of docs) {
+        const u = d.data() as any;
+        registros++;
+        const stage = Math.max(0, Math.min(6, Number(u.currentStage ?? 0)));
+        stageCounts[stage]++;
+        const status = u.lead?.status;
+        const isInscrito = status === 'won' || stage >= 3;
+        if (status === 'lost') perdidos++;
+        else if (isInscrito) inscritos++;
+        else activos++;
+
+        const abon = Number(u.payment?.totalAbonado || 0);
+        const esp = Number(u.payment?.expectedTotal || 0);
+        abonadoTotal += abon; esperadoTotal += esp;
+        if (abon > 0 || esp > 0) conPlan++;
+
+        (u.lead?.lostReasons || []).forEach((r: string) => { lostReasons[r] = (lostReasons[r] || 0) + 1; });
+        (u.lead?.wonReasons || []).forEach((r: string) => { wonReasons[r] = (wonReasons[r] || 0) + 1; });
+
+        const camp = String(u.attribution?.utm_campaign || u.attribution?.utm_source || 'Directo / orgánico');
+        const c = byCampaign[camp] || (byCampaign[camp] = { registros: 0, inscritos: 0, abonado: 0 });
+        c.registros++; if (isInscrito) c.inscritos++; c.abonado += abon;
+
+        if (u.assignedTo) {
+          const r = byRep[u.assignedTo] || (byRep[u.assignedTo] = { name: u.assignedToName || 'Vendedor', asignados: 0, inscritos: 0 });
+          r.asignados++; if (isInscrito) r.inscritos++;
+        }
+      }
+
+      const tally = (o: Record<string, number>) => Object.entries(o).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+      const campaigns = Object.entries(byCampaign)
+        .map(([campaign, v]) => ({ campaign, ...v, conversion: v.registros ? v.inscritos / v.registros : 0 }))
+        .sort((a, b) => b.registros - a.registros);
+      const reps = Object.values(byRep).sort((a, b) => b.inscritos - a.inscritos);
+
+      return res.status(200).json({
+        registros, inscritos, perdidos, activos,
+        conversion: registros ? inscritos / registros : 0,
+        abonadoTotal, esperadoTotal, porCobrar: Math.max(0, esperadoTotal - abonadoTotal), conPlan,
+        stages: STAGES.map((label, i) => ({ label, count: stageCounts[i] })),
+        lostReasons: tally(lostReasons), wonReasons: tally(wonReasons),
+        campaigns, reps,
+      });
+    }
+
     return res.status(404).json({ error: 'Acción no encontrada' });
   } catch (error: any) {
     console.error(`crm/${action} error`, error);

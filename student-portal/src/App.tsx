@@ -27,7 +27,8 @@ import {
   ArrowLeft,
   Target,
   UserCog,
-  Wallet
+  Wallet,
+  LayoutDashboard
 } from 'lucide-react';
 import { STAGES_CONFIG, LICENCIATURAS } from './constants';
 import { Message, ProfessionalProfile } from './types';
@@ -45,6 +46,7 @@ import GuidesPanel from './components/admin/GuidesPanel';
 import ProspectsPanel from './components/admin/ProspectsPanel';
 import TeamPanel from './components/admin/TeamPanel';
 import PlansPanel from './components/admin/PlansPanel';
+import DashboardPanel from './components/admin/DashboardPanel';
 import { db, storage } from './lib/firebase';
 import { collection, getDocs, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes } from 'firebase/storage';
@@ -59,7 +61,7 @@ const Portal: React.FC = () => {
   const professional = prof.professionalProfile || emptyProfile;
 
   const [previewStudent, setPreviewStudent] = useState(false);
-  const [adminModule, setAdminModule] = useState<'prospectos' | 'alumnos' | 'examenes' | 'temarios' | 'equipo' | 'planes'>('prospectos');
+  const [adminModule, setAdminModule] = useState<'dashboard' | 'prospectos' | 'alumnos' | 'examenes' | 'temarios' | 'equipo' | 'planes'>('prospectos');
   const [activeStage, setActiveStage] = useState(0);
   const showAdmin = isStaff && !previewStudent;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -209,6 +211,7 @@ const Portal: React.FC = () => {
   const currentStageInfo = STAGES_CONFIG[activeStage];
 
   const ALL_MODULES = [
+    { id: 'dashboard' as const, title: 'Dashboard', subtitle: 'Embudo', icon: <LayoutDashboard size={20} />, sales: false },
     { id: 'prospectos' as const, title: 'Prospectos', subtitle: 'Pipeline', icon: <Target size={20} />, sales: true },
     { id: 'alumnos' as const, title: 'Alumnos', subtitle: 'Gestión', icon: <Users size={20} />, sales: false },
     { id: 'examenes' as const, title: 'Exámenes', subtitle: 'Agenda', icon: <CalendarDays size={20} />, sales: false },
@@ -338,6 +341,7 @@ const Portal: React.FC = () => {
 
             {showAdmin ? (
               /* MÓDULOS DE ADMINISTRACIÓN */
+              adminModule === 'dashboard' ? <DashboardPanel /> :
               adminModule === 'prospectos' ? <ProspectsPanel /> :
               adminModule === 'alumnos' ? <StudentsPanel /> :
               adminModule === 'examenes' ? <ExamsPanel /> :
